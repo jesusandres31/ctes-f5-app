@@ -1,24 +1,24 @@
-version: '3'
+version: "3"
 
 services:
   api:
-    container_name: liber_api
-    image: registry.gitlab.com/jesusandres31/ddash/backend:latest
+    container_name: ctesf5_api
+    image: registry.gitlab.com
     restart: always
     depends_on:
       - db
   app:
-    container_name: liber_app
-    image: registry.gitlab.com/jesusandres31/ddash/frontend:latest
+    container_name: ctesf5_app
+    image: registry.gitlab.com
     restart: always
     depends_on:
       - api
   nginx:
-    container_name: liber_nginx
-    image: registry.gitlab.com/jesusandres31/ddash/nginx:latest
+    container_name: ctesf5_nginx
+    image: registry.gitlab.com
     restart: always
     ports:
-      - '8081:80'
+      - "8081:80"
     depends_on:
       - api
       - app
