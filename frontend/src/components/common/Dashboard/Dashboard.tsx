@@ -19,17 +19,9 @@ import {
   ListSubheader,
   Grid,
 } from "@mui/material";
-import {
-  MenuRounded,
-  WidgetsRounded,
-  ImageRounded,
-  SaveRounded,
-  HubRounded,
-  SettingsSuggestRounded,
-} from "@mui/icons-material";
+import { MenuRounded, WidgetsRounded } from "@mui/icons-material";
 import { AppRoutes, version } from "src/config";
 import { useRouter } from "src/hooks/useRouter";
-import DockerIcon from "src/assets/DockerIcon";
 import LoginButton from "./LoginButton";
 import { IMenuItem } from "src/types";
 import { useIsMobile } from "src/hooks";
@@ -38,32 +30,17 @@ const DRAWER_WIDTH = 230;
 
 const MENU_ITEMS_FIRST: IMenuItem[] = [
   {
-    text: "Containers",
+    text: "Egresos",
     icon: <WidgetsRounded />,
-    to: AppRoutes.Containers,
-  },
-  {
-    text: "Images",
-    icon: <ImageRounded />,
-    to: AppRoutes.Images,
-  },
-  {
-    text: "Volumes",
-    icon: <SaveRounded />,
-    to: AppRoutes.Volumes,
-  },
-  {
-    text: "Networks",
-    icon: <HubRounded />,
-    to: AppRoutes.Networks,
+    to: AppRoutes.Expenses,
   },
 ];
 
 const MENU_ITEMS_SECOND: IMenuItem[] = [
   {
-    text: "System Info",
-    icon: <SettingsSuggestRounded />,
-    to: AppRoutes.System,
+    text: "Cto. Egresos",
+    icon: <WidgetsRounded />,
+    to: AppRoutes.ExpenseConcepts,
   },
 ];
 
@@ -146,9 +123,9 @@ const CustomDrawer = () => {
   return (
     <div>
       <Toolbar sx={{ backgroundColor: theme.palette.primary.main }}>
-        <DockerIcon />
+        {/* <SportsSoccerRounded sx={{ color: "background.default" }} /> */}
         <Typography variant="subtitle1" color="background.default">
-          {`\xa0ddash v${version}`}
+          {`\xa0Ctes F5 v${version}`}
         </Typography>
       </Toolbar>
       <Box px={1}>

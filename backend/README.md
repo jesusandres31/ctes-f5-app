@@ -10,3 +10,7 @@
 admin@admin.com
 admin123456
 ```
+
+- test user:
+  test@test.com
+  12345678

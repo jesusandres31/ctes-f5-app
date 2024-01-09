@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect } from "react";
+import React, { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { NotFound, SignIn, Unauthorized } from "src/pages";
 import {
@@ -8,11 +8,13 @@ import {
   ProtectedRoute,
 } from "src/components/common";
 import { AppRoutes, conf } from "src/config";
-import { useAuthSelector } from "src/slices/auth/authSlice";
 import { useAuth } from "src/hooks";
 
 const Expenses = lazy(() =>
   import("src/pages").then((module) => ({ default: module.Expenses }))
+);
+const ExpenseConcepts = lazy(() =>
+  import("src/pages").then((module) => ({ default: module.ExpenseConcepts }))
 );
 
 const privateRoutes = [
@@ -20,15 +22,14 @@ const privateRoutes = [
     route: AppRoutes.Expenses,
     render: <Expenses />,
   },
+  {
+    route: AppRoutes.ExpenseConcepts,
+    render: <ExpenseConcepts />,
+  },
 ];
 
 function App(): JSX.Element {
-  const { isLoggedIn } = useAuthSelector((state) => state.auth);
-  const { handleCheckAuth } = useAuth();
-
-  useEffect(() => {
-    handleCheckAuth();
-  }, []);
+  const { isLoggedIn } = useAuth();
 
   return (
     <React.Fragment>
@@ -52,8 +53,7 @@ function App(): JSX.Element {
               <Route
                 key={privateRoute.route}
                 path={privateRoute.route}
-                /* element={<ProtectedRoute>{privateRoute.render}</ProtectedRoute>} */
-                element={privateRoute.render}
+                element={<ProtectedRoute>{privateRoute.render}</ProtectedRoute>}
               />
             ))}
           </Route>

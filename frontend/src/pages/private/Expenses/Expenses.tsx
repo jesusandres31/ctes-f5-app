@@ -1,32 +1,51 @@
-import { Expense } from "src/interfaces";
+import { GetExpenseRes } from "src/interfaces";
 import { IColumn } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
 import { useGetExpensesQuery } from "src/app/services/expenseService";
 
-const columns: IColumn<Expense>[] = [
+const columns: IColumn<GetExpenseRes>[] = [
   {
-    minWidth: 50,
-    label: "Amount",
-    id: "amount",
+    minWidth: 150,
+    label: "Concepto",
+    id: "expense_concept",
+    render: (item) => item.expand.expense_concept.name,
     align: "left",
   },
   {
     minWidth: 150,
+    label: "Detalle",
+    id: "detail",
+    align: "left",
+  },
+  {
+    minWidth: 100,
+    label: "Cantidad",
+    id: "amount",
+    align: "right",
+  },
+  {
+    minWidth: 100,
+    label: "Precio Unit.",
+    id: "unit_price",
+    align: "right",
+  },
+  {
+    minWidth: 100,
     label: "Total",
     id: "total",
-    align: "left",
+    align: "right",
   },
 ];
 
-export default function Containers() {
-  const { data: expenses, error } = useGetExpensesQuery();
+export default function Expenses() {
+  const { data: expenses, isLoading, error } = useGetExpensesQuery();
 
   return (
     <DataGrid
+      columns={columns}
       items={expenses}
       error={error}
-      columns={columns}
-      noItemsMsg="No Images built"
+      isLoading={isLoading}
     />
   );
 }

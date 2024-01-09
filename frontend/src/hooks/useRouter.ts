@@ -17,9 +17,12 @@ export const useRouter = () => {
     return location.pathname;
   };
 
+  const route = location.pathname;
+
   return {
     handleGoTo,
     getRouteTitle,
     getRoute,
+    route,
   };
 };

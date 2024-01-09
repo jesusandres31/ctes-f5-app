@@ -1,14 +1,32 @@
-export interface SignUpRes {
-  accessToken: string;
-  refreshToken: string;
+// export interface SignUpRes {
+//   accessToken: string;
+//   refreshToken: string;
+// }
+
+// export type RefreshTokenRes = SignUpRes;
+
+interface UserRecord {
+  avatar: string;
+  collectionId: string;
+  collectionName: string;
+  created: string;
+  email: string;
+  emailVisibility: boolean;
+  id: string;
+  name: string;
+  updated: string;
+  username: string;
+  verified: boolean;
 }
 
-export type RefreshTokenRes = SignUpRes;
+export interface SignUpRes {
+  record: UserRecord;
+  token: string;
+}
 
 export interface SignInReq {
   email: string;
   password: string;
-  remember: boolean;
 }
 
 export interface Token {

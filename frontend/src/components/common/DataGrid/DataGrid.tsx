@@ -6,29 +6,35 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
-import {
-  Divider,
-  Grid,
-  IconButton,
-  Toolbar,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import { MenuRounded, SearchOffRounded } from "@mui/icons-material";
+import { Divider, Grid, Toolbar, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "src/hooks/useRouter";
-import { Image, Container } from "src/interfaces";
 import { IColumn } from "src/types";
 import { formatNulls } from "src/utils";
-import Loading from "src/components/common/Loading";
+import { Loading, ErrorMsg } from "src/components/common";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { SerializedError } from "@reduxjs/toolkit";
 import PageContainer from "../PageContainer/PageContainer";
+import { GetExpenseConceptRes, GetExpenseRes } from "src/interfaces";
+import NoItems from "../NoItems";
+import { AppRoutes } from "src/config";
 
-type Item = Container | Image;
+type Item = GetExpenseRes | GetExpenseConceptRes;
 
 // we have to create this Type due to this error message:
 // "The expected type comes from property 'columns' which is declared here on type 'IntrinsicAttributes & DataGridProps'."
-type Column = IColumn<Container>[] | IColumn<Image>[];
+type Column = IColumn<GetExpenseRes>[] | IColumn<GetExpenseConceptRes>[];
+
+// translate title in grid
+const translateTitle = (title: string) => {
+  switch (title) {
+    case AppRoutes.Expenses:
+      return "Egresos";
+    case AppRoutes.ExpenseConcepts:
+      return "Conceptos de Egresos";
+    default:
+      return title;
+  }
+};
 
 /**
  * Virtualized table components
@@ -58,7 +64,7 @@ function fixedHeaderContent(columns: Column): React.ReactNode {
     <TableRow>
       {columns.map((column) => (
         <TableCell
-          key={column.dataKey}
+          key={column.id}
           variant="head"
           align={column.align ?? "right"}
           style={{ width: column.minWidth }}
@@ -79,9 +85,9 @@ function rowContent(_index: number, row: Item, columns: IColumn<Item>[]) {
   return (
     <>
       {columns.map((column) => {
-        const labe = column.render
+        const value = column.render
           ? column.render(row)
-          : formatNulls(row[column.dataKey]);
+          : formatNulls(row[column.id]);
 
         return (
           <TableCell
@@ -89,11 +95,11 @@ function rowContent(_index: number, row: Item, columns: IColumn<Item>[]) {
             component="th"
             scope="row"
             size="small"
-            key={column.dataKey}
+            key={column.id}
             align={column.align ?? "right"}
             sx={{ cursor: "pointer" }}
           >
-            <Tooltip title={labe}>
+            <Tooltip title={value}>
               <Typography
                 variant="subtitle2"
                 noWrap
@@ -103,7 +109,9 @@ function rowContent(_index: number, row: Item, columns: IColumn<Item>[]) {
                   whiteSpace: "nowrap",
                 }}
               >
-                {labe}
+                {typeof value === "string"
+                  ? value.charAt(0).toUpperCase() + value.slice(1)
+                  : value}
               </Typography>
             </Tooltip>
           </TableCell>
@@ -116,7 +124,8 @@ function rowContent(_index: number, row: Item, columns: IColumn<Item>[]) {
 interface TableToolbarProps {}
 
 function TableToolbar({}: TableToolbarProps) {
-  const { getRouteTitle } = useRouter();
+  const { route } = useRouter();
+
   return (
     <Toolbar
       sx={{
@@ -141,15 +150,8 @@ function TableToolbar({}: TableToolbarProps) {
                 component="div"
                 color="text.primary"
               >
-                {getRouteTitle()}
+                {translateTitle(route)}
               </Typography>
-            </Grid>
-            <Grid item>
-              <Tooltip title="Filter list">
-                <IconButton>
-                  <MenuRounded />
-                </IconButton>
-              </Tooltip>
             </Grid>
           </Grid>
         </Grid>
@@ -161,15 +163,15 @@ function TableToolbar({}: TableToolbarProps) {
 interface DataGridProps extends TableToolbarProps {
   items: Item[] | undefined;
   error: FetchBaseQueryError | SerializedError | undefined;
+  isLoading: boolean;
   columns: Column;
-  noItemsMsg: string;
 }
 
 export default function DataGrid({
   items,
   error,
+  isLoading,
   columns,
-  noItemsMsg,
   ...rest
 }: DataGridProps) {
   return (
@@ -207,38 +209,33 @@ export default function DataGrid({
             </Grid>
           </React.Fragment>
         ) : error ? (
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            sx={{ height: "100%" }}
-            direction="column"
-            spacing={1}
-          >
-            <Grid item>
-              <SearchOffRounded
-                fontSize="large"
-                sx={{ color: "text.secondary" }}
-              />
-            </Grid>
-            <Grid item sx={{ textAlign: "center" }}>
-              <Typography variant="subtitle1" color="text.secondary">
-                {noItemsMsg}
-              </Typography>
-            </Grid>
-          </Grid>
-        ) : (
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            sx={{ height: "100%" }}
-            direction="column"
-          >
+          <CustomGrid>
+            <ErrorMsg />
+          </CustomGrid>
+        ) : isLoading ? (
+          <CustomGrid>
             <Loading />
-          </Grid>
+          </CustomGrid>
+        ) : (
+          <CustomGrid>
+            <NoItems />
+          </CustomGrid>
         )}
       </>
     </PageContainer>
   );
 }
+
+const CustomGrid = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <Grid
+      container
+      justifyContent="center"
+      alignItems="center"
+      sx={{ height: "100%" }}
+      direction="column"
+    >
+      {children}
+    </Grid>
+  );
+};

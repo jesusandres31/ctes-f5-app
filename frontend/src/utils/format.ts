@@ -11,3 +11,10 @@ export const removeExtraSpace = (str: string) => {
   }
   return str;
 };
+
+export const formatNulls = (value: any) => {
+  if (value === "" || value === null) {
+    value = "-";
+  }
+  return value;
+};

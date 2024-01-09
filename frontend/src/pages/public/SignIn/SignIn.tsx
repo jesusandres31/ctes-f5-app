@@ -3,8 +3,6 @@ import {
   Avatar,
   CssBaseline,
   TextField,
-  FormControlLabel,
-  Checkbox,
   Link,
   Box,
   Typography,
@@ -29,7 +27,6 @@ export default function SignIn() {
     initialValues: {
       email: "",
       password: "",
-      remember: true,
     },
     validationSchema: Yup.object({
       email: Yup.string()
@@ -128,20 +125,6 @@ export default function SignIn() {
               min: VLDN.PSSWD.min,
             }}
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                value="remember"
-                color="primary"
-                checked={formik.values.remember}
-                onChange={() => {
-                  formik.setFieldValue("remember", !formik.values.remember);
-                  handleResetError();
-                }}
-              />
-            }
-            label="Remember me"
-          />
           <LoadingButton
             type="submit"
             fullWidth
@@ -152,13 +135,6 @@ export default function SignIn() {
             Sign In
           </LoadingButton>
         </Box>
-      </Box>
-      <Box sx={{ mt: 8, mb: 4 }}>
-        <Typography variant="body2" color="text.secondary" align="center">
-          <Link color="inherit" href={URL.REPO} target="_blank">
-            Documentation
-          </Link>
-        </Typography>
       </Box>
     </Container>
   );

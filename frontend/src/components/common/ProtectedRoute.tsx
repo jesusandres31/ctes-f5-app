@@ -1,13 +1,13 @@
 import { Navigate } from "react-router-dom";
 import { AppRoutes } from "src/config";
-import { useAuthSelector } from "src/slices/auth/authSlice";
+import { useAuth } from "src/hooks";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isLoggedIn } = useAuthSelector((state) => state.auth);
+  const { isLoggedIn } = useAuth();
 
   if (!isLoggedIn) {
     return <Navigate to={AppRoutes.Login} />;
