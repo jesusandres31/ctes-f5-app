@@ -1,12 +1,22 @@
-import * as React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
+import React, { useEffect, useState } from "react";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
-import { Divider, Grid, Toolbar, Tooltip, Typography } from "@mui/material";
+import {
+  TableRow,
+  TableHead,
+  TableContainer,
+  TableCell,
+  TableBody,
+  Table,
+  Divider,
+  Grid,
+  IconButton,
+  Toolbar,
+  Tooltip,
+  Typography,
+  Button,
+  Checkbox,
+  Container,
+} from "@mui/material";
 import { useRouter } from "src/hooks/useRouter";
 import { IColumn } from "src/types";
 import { formatNulls } from "src/utils";
@@ -17,6 +27,12 @@ import PageContainer from "../PageContainer/PageContainer";
 import { GetExpenseConceptRes, GetExpenseRes } from "src/interfaces";
 import NoItems from "../NoItems";
 import { AppRoutes } from "src/config";
+import {
+  AddCircleOutlineRounded,
+  CreateRounded,
+  DeleteForeverRounded,
+} from "@mui/icons-material";
+import { useIsMobile } from "src/hooks";
 
 type Item = GetExpenseRes | GetExpenseConceptRes;
 
@@ -53,7 +69,7 @@ const VirtuosoTableComponents: TableComponents<Item, IColumn<Item>[]> = {
     />
   ),
   TableHead,
-  TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
+  TableRow: ({ item: _item, ...props }) => <TableRow selected {...props} />,
   TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
     <TableBody {...props} ref={ref} />
   )),
@@ -62,6 +78,18 @@ const VirtuosoTableComponents: TableComponents<Item, IColumn<Item>[]> = {
 function fixedHeaderContent(columns: Column): React.ReactNode {
   return (
     <TableRow>
+      <TableCell padding="checkbox">
+        <Checkbox
+          color="primary"
+          /* indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            onChange={onSelectAllClick} */
+          inputProps={{
+            "aria-label": "select all desserts",
+          }}
+        />
+      </TableCell>
+
       {columns.map((column) => (
         <TableCell
           key={column.id}
@@ -81,9 +109,19 @@ function fixedHeaderContent(columns: Column): React.ReactNode {
   );
 }
 
-function rowContent(_index: number, row: Item, columns: IColumn<Item>[]) {
+function rowContent(
+  _index: number,
+  row: Item,
+  columns: IColumn<Item>[],
+  isSelected: boolean,
+  handleSelectItem: (item: string) => void
+) {
   return (
     <>
+      {/* <TableRow selected={isSelected} onClick={() => handleSelectItem(row.id)}> */}
+      <TableCell padding="checkbox" sx={{ cursor: "pointer" }}>
+        <Checkbox color="primary" checked={isSelected} />
+      </TableCell>
       {columns.map((column) => {
         const value = column.render
           ? column.render(row)
@@ -91,7 +129,7 @@ function rowContent(_index: number, row: Item, columns: IColumn<Item>[]) {
 
         return (
           <TableCell
-            height={70}
+            height={60}
             component="th"
             scope="row"
             size="small"
@@ -99,24 +137,26 @@ function rowContent(_index: number, row: Item, columns: IColumn<Item>[]) {
             align={column.align ?? "right"}
             sx={{ cursor: "pointer" }}
           >
-            <Tooltip title={value}>
-              <Typography
-                variant="subtitle2"
-                noWrap
-                sx={{
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {typeof value === "string"
-                  ? value.charAt(0).toUpperCase() + value.slice(1)
-                  : value}
-              </Typography>
-            </Tooltip>
+            {/* <Tooltip title={value}> */}
+            <Typography
+              variant="subtitle2"
+              noWrap
+              color="text.secondary"
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {typeof value === "string"
+                ? value.charAt(0).toUpperCase() + value.slice(1)
+                : value}
+            </Typography>
+            {/* </Tooltip> */}
           </TableCell>
         );
       })}
+      {/*  </TableRow> */}
     </>
   );
 }
@@ -125,6 +165,7 @@ interface TableToolbarProps {}
 
 function TableToolbar({}: TableToolbarProps) {
   const { route } = useRouter();
+  const { isMobile } = useIsMobile();
 
   return (
     <Toolbar
@@ -132,27 +173,65 @@ function TableToolbar({}: TableToolbarProps) {
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
         flex: "0 0 auto",
+        py: 2,
       }}
     >
-      <Grid container spacing={2} direction="column">
+      <Grid
+        container
+        justifyContent="space-between"
+        alignItems="center"
+        spacing={2}
+      >
+        <Grid item>
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            variant="h6"
+            id="tableTitle"
+            component="div"
+            color="text.primary"
+          >
+            {translateTitle(route)}
+          </Typography>
+        </Grid>
         <Grid item>
           <Grid
             container
-            direction="row"
             justifyContent="space-between"
             alignItems="center"
+            spacing={2}
           >
             <Grid item>
-              <Typography
-                sx={{ flex: "1 1 100%" }}
-                variant="h6"
-                id="tableTitle"
-                component="div"
-                color="text.primary"
+              <Grid
+                container
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{ gap: isMobile ? 0 : 2 }}
               >
-                {translateTitle(route)}
-              </Typography>
+                <CustomButton
+                  color="success"
+                  text="Create"
+                  icon={<AddCircleOutlineRounded />}
+                  onClick={() => {}}
+                />
+                <CustomButton
+                  color="info"
+                  text="Update"
+                  icon={<CreateRounded />}
+                  onClick={() => {}}
+                />
+                <CustomButton
+                  color="error"
+                  text="Remove"
+                  icon={<DeleteForeverRounded />}
+                  onClick={() => {}}
+                />
+              </Grid>
             </Grid>
+            {/* <Grid item>
+              <IconButton onClick={() => {}}>
+                <MoreVertRounded />
+              </IconButton>
+            </Grid> */}
           </Grid>
         </Grid>
       </Grid>
@@ -174,6 +253,29 @@ export default function DataGrid({
   columns,
   ...rest
 }: DataGridProps) {
+  const { route } = useRouter();
+
+  useEffect(() => {
+    setSelectedItemIds([]);
+  }, [route]);
+
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+
+  const handleSelectItem = (itemId: string) => {
+    setSelectedItemIds((prevItemIds) => {
+      if (prevItemIds.includes(itemId)) {
+        return prevItemIds.filter((id) => id !== itemId);
+      } else {
+        return [...prevItemIds, itemId];
+      }
+    });
+  };
+
+  const isSelected = (itemId: string) => {
+    if (!selectedItemIds) return false;
+    return selectedItemIds.some((selectedItem) => selectedItem === itemId);
+  };
+
   return (
     <PageContainer>
       <>
@@ -188,8 +290,15 @@ export default function DataGrid({
               components={VirtuosoTableComponents}
               fixedHeaderContent={() => fixedHeaderContent(columns)}
               itemContent={(_index, row) =>
-                rowContent(_index, row, columns as IColumn<Item>[])
+                rowContent(
+                  _index,
+                  row,
+                  columns as IColumn<Item>[],
+                  isSelected(row.id),
+                  handleSelectItem
+                )
               }
+              totalCount={items.length}
             />
             <Grid container justifyContent="center" flexDirection="column">
               <Divider />
@@ -237,5 +346,38 @@ const CustomGrid = ({ children }: { children: React.ReactNode }) => {
     >
       {children}
     </Grid>
+  );
+};
+
+const CustomButton = ({
+  color,
+  text,
+  onClick,
+  icon,
+}: {
+  color:
+    | "inherit"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "error"
+    | "info"
+    | "warning";
+  text: string;
+  onClick: Function;
+  icon: React.ReactNode;
+}) => {
+  const { isMobile } = useIsMobile();
+
+  return (
+    <Button
+      variant="outlined"
+      color={color}
+      size={isMobile ? "small" : "medium"}
+      onClick={(e) => onClick(e)}
+      startIcon={icon}
+    >
+      <Typography sx={{ fontWeight: "bold" }}>{text}</Typography>
+    </Button>
   );
 };

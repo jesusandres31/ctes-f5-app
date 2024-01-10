@@ -11,7 +11,6 @@ import {
 import {
   AccountCircleRounded,
   PowerSettingsNewRounded,
-  PersonRounded,
 } from "@mui/icons-material";
 import { useAuth } from "src/hooks";
 import { AppRoutes } from "src/config";
@@ -36,12 +35,12 @@ export default function LoginButton() {
   };
 
   const ITEMS: IMenuItem[] = [
-    {
-      text: "Profile",
-      icon: <PersonRounded />,
-      to: AppRoutes.Profile,
-      onClick: () => {},
-    },
+    // {
+    //   text: "Profile",
+    //   icon: <PersonRounded />,
+    //   to: AppRoutes.Profile,
+    //   onClick: () => {},
+    // },
     {
       text: "Logout",
       icon: <PowerSettingsNewRounded />,
@@ -84,7 +83,7 @@ export default function LoginButton() {
             to={item.to}
           >
             <ListItemIcon
-              sx={{ minWidth: "40px", color: theme.palette.secondary.main }}
+              sx={{ minWidth: "40px", color: theme.palette.primary.light }}
             >
               {item.icon}
             </ListItemIcon>

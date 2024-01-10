@@ -57,13 +57,21 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 5,
+    borderRadius: 8,
   },
   typography: {
     fontFamily: ["Arimo", "sans-serif"].join(","),
     fontSize: 13.5,
   },
-  components: {},
+  components: {
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          color: "text.secondary",
+        },
+      },
+    },
+  },
 });
 
 export default theme;

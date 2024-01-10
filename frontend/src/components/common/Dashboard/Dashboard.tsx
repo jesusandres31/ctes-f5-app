@@ -19,7 +19,12 @@ import {
   ListSubheader,
   Grid,
 } from "@mui/material";
-import { MenuRounded, WidgetsRounded } from "@mui/icons-material";
+import {
+  KeyboardDoubleArrowDownRounded,
+  KeyboardDoubleArrowUpRounded,
+  MenuRounded,
+  PresentToAllRounded,
+} from "@mui/icons-material";
 import { AppRoutes, version } from "src/config";
 import { useRouter } from "src/hooks/useRouter";
 import LoginButton from "./LoginButton";
@@ -30,16 +35,26 @@ const DRAWER_WIDTH = 230;
 
 const MENU_ITEMS_FIRST: IMenuItem[] = [
   {
+    text: "Ingresos",
+    icon: <KeyboardDoubleArrowDownRounded />,
+    to: AppRoutes.Incomes,
+  },
+  {
     text: "Egresos",
-    icon: <WidgetsRounded />,
+    icon: <KeyboardDoubleArrowUpRounded />,
     to: AppRoutes.Expenses,
   },
 ];
 
 const MENU_ITEMS_SECOND: IMenuItem[] = [
   {
-    text: "Cto. Egresos",
-    icon: <WidgetsRounded />,
+    text: "Concept. Ingreso",
+    icon: <PresentToAllRounded sx={{ transform: "rotate(180deg)" }} />,
+    to: AppRoutes.IncomeConcepts,
+  },
+  {
+    text: "Concept. Egresos",
+    icon: <PresentToAllRounded />,
     to: AppRoutes.ExpenseConcepts,
   },
 ];
@@ -100,7 +115,7 @@ const CustomList = ({ items, subheader }: CustomListProps) => {
                 sx={{
                   minWidth: "40px",
                   // color: theme.palette.text.secondary,
-                  color: theme.palette.secondary.light,
+                  color: theme.palette.primary.light,
                   // color: isSelected(item.to)
                   //   ? lighten(theme.palette.primary.main, 0.15)
                   //   : theme.palette.text.secondary,
@@ -129,7 +144,7 @@ const CustomDrawer = () => {
         </Typography>
       </Toolbar>
       <Box px={1}>
-        <CustomList items={MENU_ITEMS_FIRST} subheader="Dashboards" />
+        <CustomList items={MENU_ITEMS_FIRST} subheader="Main Dashboard" />
       </Box>
       <Divider variant="middle" />
       <Box px={1}>
