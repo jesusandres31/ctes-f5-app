@@ -21,10 +21,10 @@ import {
   lighten,
 } from "@mui/material";
 import {
-  KeyboardDoubleArrowDownRounded,
-  KeyboardDoubleArrowUpRounded,
+  FileDownloadRounded,
   MenuRounded,
   PresentToAllRounded,
+  FileUploadRounded,
 } from "@mui/icons-material";
 import { AppRoutes, version } from "src/config";
 import { useRouter } from "src/hooks/useRouter";
@@ -34,17 +34,15 @@ import { useIsMobile } from "src/hooks";
 
 const DRAWER_WIDTH = 230;
 
-const smallIconStyle = { fontSize: "30px", marginLeft: "-3.5px" };
-
 const MENU_ITEMS_FIRST: IMenuItem[] = [
   {
     text: "Ingresos",
-    icon: <KeyboardDoubleArrowDownRounded sx={smallIconStyle} />,
+    icon: <FileDownloadRounded />,
     to: AppRoutes.Incomes,
   },
   {
     text: "Egresos",
-    icon: <KeyboardDoubleArrowUpRounded sx={smallIconStyle} />,
+    icon: <FileUploadRounded />,
     to: AppRoutes.Expenses,
   },
 ];
@@ -72,6 +70,7 @@ const CustomList = ({ items, subheader }: CustomListProps) => {
   const theme = useTheme();
   const isSelected = (path: string) => getRoute() === path;
   const backgroundColor = darken(theme.palette.background.default, 0.08);
+  const borderRadius = 8;
 
   return (
     <List
@@ -92,17 +91,20 @@ const CustomList = ({ items, subheader }: CustomListProps) => {
             height: "45px",
             "&.Mui-selected": {
               // color: theme.palette.primary.main,
-              backgroundColor,
-              borderRadius: 5,
+              backgroundColor /* : lighten(theme.palette.primary.light, 0.7) */,
+              borderRadius,
             },
             "&:hover": {
               backgroundColor,
-              borderRadius: 5,
+              borderRadius,
             },
             "&.Mui-selected:hover": {
-              backgroundColor,
-              borderRadius: 5,
+              backgroundColor /* : lighten(theme.palette.primary.light, 0.7) */,
+              borderRadius,
             },
+            /* border: isSelected(item.to)
+              ? `1px solid ${lighten(theme.palette.primary.light, 0.7)}`
+              : "none", */
           }}
         >
           <ListItemButton
@@ -118,8 +120,8 @@ const CustomList = ({ items, subheader }: CustomListProps) => {
                 sx={{
                   minWidth: "40px",
                   color: isSelected(item.to)
-                    ? lighten(theme.palette.primary.main, 0.1)
-                    : lighten(theme.palette.text.secondary, 0.3),
+                    ? theme.palette.primary.main
+                    : lighten(theme.palette.text.secondary, 0.2),
                 }}
               >
                 {item.icon}
@@ -130,7 +132,9 @@ const CustomList = ({ items, subheader }: CustomListProps) => {
                 <Typography
                   variant="subtitle2"
                   color={
-                    isSelected(item.to) ? "text.primary" : "text.secondary"
+                    isSelected(item.to)
+                      ? theme.palette.primary.main
+                      : "text.secondary"
                   }
                 >
                   {item.text}

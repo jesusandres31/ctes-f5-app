@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect } from "react";
+import React, { ChangeEvent, useCallback, useEffect } from "react";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
 import {
   TableRow,
@@ -68,7 +68,10 @@ function fixedHeaderContent(
 ): React.ReactNode {
   return (
     <TableRow>
-      <TableCell padding="checkbox">
+      <TableCell
+        padding="checkbox"
+        sx={{ backgroundColor: "background.paper" }}
+      >
         <Checkbox
           color="primary"
           checked={isAllSelected}
@@ -111,7 +114,7 @@ function rowContent(
       <TableCell
         padding="checkbox"
         sx={{ cursor: "pointer" }}
-        onClick={() => handleSelectItem(row.id)}
+        /* onClick={() => handleSelectItem(row.id)} */
       >
         <Checkbox color="primary" checked={isSelected} />
       </TableCell>
@@ -122,7 +125,7 @@ function rowContent(
 
         return (
           <TableCell
-            height={60}
+            height={55}
             component="th"
             scope="row"
             size="small"
@@ -242,6 +245,32 @@ interface DataGridProps {
   columns: Column;
 }
 
+// move VirtuosoTableComponents outside DataGrid because it causes a constant re rendering on select item.
+const VirtuosoTableComponents: TableComponents<Item> = {
+  Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
+    <TableContainer {...props} ref={ref} />
+  )),
+  Table: (props) => (
+    <Table
+      {...props}
+      sx={{
+        borderCollapse: "separate",
+        tableLayout: "fixed",
+      }}
+    />
+  ),
+  TableHead,
+  TableRow: ({ item: _item, ...props }) => {
+    const { selectedItems } = useUISelector((state) => state.ui);
+    return (
+      <TableRow selected={isSelected(selectedItems, _item.id)} {...props} />
+    );
+  },
+  TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
+    <TableBody {...props} ref={ref} />
+  )),
+};
+
 export default function DataGrid({
   items,
   error,
@@ -252,6 +281,9 @@ export default function DataGrid({
   const dispatch = useAppDispatch();
   const { route } = useRouter();
   const { selectedItems } = useUISelector((state) => state.ui);
+  const [page, setPage] = React.useState(0);
+
+  const rowsPerPage = 20;
 
   const isAllSelected = items?.length === selectedItems.length;
 
@@ -259,37 +291,26 @@ export default function DataGrid({
     dispatch(resetSelectedItems());
   }, [route]);
 
-  const handleSelectItem = (itemId: string) => {
-    dispatch(setSelectedItems(itemId));
+  const handleChangePage = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
+    newPage: number
+  ) => {
+    setPage(newPage);
   };
+
+  // const handleSelectItem = (itemId: string) => {
+  //   dispatch(setSelectedItems(itemId));
+  // };
+  const handleSelectItem = useCallback(
+    (itemId: string) => {
+      dispatch(setSelectedItems(itemId));
+    },
+    [dispatch]
+  );
 
   const handleSelectAll = () => {
     if (isAllSelected) return dispatch(resetSelectedItems());
     if (items) return dispatch(setSelectedItems(items.map((item) => item.id)));
-  };
-
-  const VirtuosoTableComponents: TableComponents<Item> = {
-    Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
-      <TableContainer {...props} ref={ref} />
-    )),
-    Table: (props) => (
-      <Table
-        {...props}
-        sx={{
-          borderCollapse: "separate",
-          tableLayout: "fixed",
-        }}
-      />
-    ),
-    TableHead,
-    TableRow: ({ item: _item, ...props }) => {
-      return (
-        <TableRow selected={isSelected(selectedItems, _item.id)} {...props} />
-      );
-    },
-    TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
-      <TableBody {...props} ref={ref} />
-    )),
   };
 
   const itemContent = (_index: number, row: Item) =>
@@ -300,6 +321,9 @@ export default function DataGrid({
       isSelected(selectedItems, row.id),
       handleSelectItem
     );
+
+  // TODO: implement pagination and virtualization
+  const pagination = false;
 
   return (
     <PageContainer>
@@ -326,28 +350,32 @@ export default function DataGrid({
             />
             <Grid container justifyContent="center" flexDirection="column">
               <Divider />
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={/* rows.length */ 10}
-                rowsPerPage={/* rowsPerPage */ 10}
-                page={/* page */ 1}
-                onPageChange={/* handleChangePage */ () => {}}
-                onRowsPerPageChange={/* handleChangeRowsPerPage */ () => {}}
-              />
-              {/* <Grid item p={2}>
-                <Grid container justifyContent="flex-end">
-                  <Grid item>
-                    <Typography
-                      variant="subtitle2"
-                      color="text.primary"
-                      sx={{ mt: 1 }}
-                    >
-                      {`Showing ${items.length} items`}
-                    </Typography>
+              {pagination ? (
+                <TablePagination
+                  rowsPerPageOptions={[rowsPerPage]}
+                  component="div"
+                  count={items.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  labelDisplayedRows={(from) =>
+                    `${from.from}-${
+                      from.to === -1 ? from.count : from.to
+                    } ${"of"} ${from.count} items showing`
+                  }
+                  // onRowsPerPageChange={() => {}}
+                />
+              ) : (
+                <Grid item p={2}>
+                  <Grid container justifyContent="flex-end">
+                    <Grid item>
+                      <Typography variant="subtitle2" color="text.primary">
+                        {`Showing ${items.length} items`}
+                      </Typography>
+                    </Grid>
                   </Grid>
                 </Grid>
-              </Grid> */}
+              )}
             </Grid>
           </React.Fragment>
         ) : error ? (
