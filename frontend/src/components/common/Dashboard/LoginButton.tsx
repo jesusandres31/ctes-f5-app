@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import {
   AccountCircleRounded,
+  PersonRounded,
   PowerSettingsNewRounded,
 } from "@mui/icons-material";
 import { useAuth } from "src/hooks";
@@ -35,12 +36,12 @@ export default function LoginButton() {
   };
 
   const ITEMS: IMenuItem[] = [
-    // {
-    //   text: "Profile",
-    //   icon: <PersonRounded />,
-    //   to: AppRoutes.Profile,
-    //   onClick: () => {},
-    // },
+    {
+      text: "Profile",
+      icon: <PersonRounded />,
+      to: AppRoutes.Profile,
+      onClick: () => {},
+    },
     {
       text: "Logout",
       icon: <PowerSettingsNewRounded />,
