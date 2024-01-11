@@ -31,7 +31,7 @@ const theme = createTheme({
     // },
     // beerboard
     primary: {
-      main: "#e26544",
+      main: "#747BFF",
     },
     secondary: {
       main: "#f6a92c",
@@ -49,10 +49,11 @@ const theme = createTheme({
       main: "#5faf69",
     },
     text: {
-      primary: "#050505",
+      // primary: "#050505",
+      primary: "#3C3C43",
     },
     background: {
-      default: "#fafafa",
+      default: "#F6F6F7",
       paper: "#fafafa",
     },
   },
@@ -60,7 +61,7 @@ const theme = createTheme({
     borderRadius: 8,
   },
   typography: {
-    fontFamily: ["Arimo", "sans-serif"].join(","),
+    fontFamily: ["Inter", "sans-serif"].join(","),
     fontSize: 13.5,
   },
   components: {

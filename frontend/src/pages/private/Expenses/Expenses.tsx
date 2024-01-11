@@ -28,12 +28,14 @@ const columns: IColumn<GetExpenseRes>[] = [
     label: "Precio Unit.",
     id: "unit_price",
     align: "right",
+    render: (item) => `$ ${item.unit_price}`,
   },
   {
     minWidth: 100,
     label: "Total",
     id: "total",
     align: "right",
+    render: (item) => `$ ${item.total}`,
   },
 ];
 

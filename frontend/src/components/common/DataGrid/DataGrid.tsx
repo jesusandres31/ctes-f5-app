@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
 import {
   TableRow,
@@ -13,6 +13,7 @@ import {
   Typography,
   Button,
   Checkbox,
+  TablePagination,
 } from "@mui/material";
 import { useRouter } from "src/hooks/useRouter";
 import { IColumn } from "src/types";
@@ -57,19 +58,21 @@ const translateTitle = (title: string) => {
 };
 
 /**
- * Components:
+ * DataGrid components
  */
 function fixedHeaderContent(
   columns: Column,
-  handleSelectAll: Function
+  handleSelectAll: (e: ChangeEvent<HTMLInputElement>) => void,
+  isAllSelected: boolean,
+  selectedItems: string[]
 ): React.ReactNode {
   return (
     <TableRow>
       <TableCell padding="checkbox">
         <Checkbox
           color="primary"
-          /* indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount} */
+          checked={isAllSelected}
+          indeterminate={selectedItems.length > 0 && !isAllSelected}
           onChange={handleSelectAll}
           inputProps={{
             "aria-label": "select all desserts",
@@ -151,11 +154,12 @@ function rowContent(
   );
 }
 
-interface TableToolbarProps {}
+interface TableToolbarProps {
+  selectedItems: string[];
+}
 
-function TableToolbar({}: TableToolbarProps) {
+function TableToolbar({ selectedItems }: TableToolbarProps) {
   const { route } = useRouter();
-  const { isMobile } = useIsMobile();
 
   return (
     <Toolbar
@@ -163,7 +167,8 @@ function TableToolbar({}: TableToolbarProps) {
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
         flex: "0 0 auto",
-        py: 2,
+        pt: 2,
+        pb: 3,
       }}
     >
       <Grid
@@ -191,30 +196,31 @@ function TableToolbar({}: TableToolbarProps) {
             spacing={2}
           >
             <Grid item>
-              <Grid
-                container
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{ gap: isMobile ? 0 : 2 }}
-              >
-                <CustomButton
-                  color="success"
-                  text="Create"
-                  icon={<AddCircleOutlineRounded />}
-                  onClick={() => {}}
-                />
-                <CustomButton
-                  color="info"
-                  text="Update"
-                  icon={<CreateRounded />}
-                  onClick={() => {}}
-                />
-                <CustomButton
-                  color="error"
-                  text="Remove"
-                  icon={<DeleteForeverRounded />}
-                  onClick={() => {}}
-                />
+              <Grid container alignItems="center" sx={{ gap: 2 }}>
+                {selectedItems.length === 0 && (
+                  <CustomButton
+                    color="success"
+                    text="Create"
+                    icon={<AddCircleOutlineRounded />}
+                    onClick={() => {}}
+                  />
+                )}
+                {selectedItems.length === 1 && (
+                  <CustomButton
+                    color="info"
+                    text="Update"
+                    icon={<CreateRounded />}
+                    onClick={() => {}}
+                  />
+                )}
+                {selectedItems.length > 0 && (
+                  <CustomButton
+                    color="error"
+                    text="Remove"
+                    icon={<DeleteForeverRounded />}
+                    onClick={() => {}}
+                  />
+                )}
               </Grid>
             </Grid>
             {/* <Grid item>
@@ -229,7 +235,7 @@ function TableToolbar({}: TableToolbarProps) {
   );
 }
 
-interface DataGridProps extends TableToolbarProps {
+interface DataGridProps {
   items: Item[] | undefined;
   error: FetchBaseQueryError | SerializedError | undefined;
   isLoading: boolean;
@@ -247,6 +253,8 @@ export default function DataGrid({
   const { route } = useRouter();
   const { selectedItems } = useUISelector((state) => state.ui);
 
+  const isAllSelected = items?.length === selectedItems.length;
+
   useEffect(() => {
     dispatch(resetSelectedItems());
   }, [route]);
@@ -256,7 +264,8 @@ export default function DataGrid({
   };
 
   const handleSelectAll = () => {
-    dispatch(setSelectedItems(items?.map((item) => item.id) || []));
+    if (isAllSelected) return dispatch(resetSelectedItems());
+    if (items) return dispatch(setSelectedItems(items.map((item) => item.id)));
   };
 
   const VirtuosoTableComponents: TableComponents<Item> = {
@@ -297,24 +306,40 @@ export default function DataGrid({
       <>
         {items && items.length > 0 ? (
           <React.Fragment>
-            <TableToolbar {...rest} />
+            <TableToolbar {...rest} selectedItems={selectedItems} />
             <TableVirtuoso
               style={{
                 flex: "1 1 auto",
               }}
               data={items}
-              fixedHeaderContent={() => fixedHeaderContent(columns)}
+              fixedHeaderContent={() =>
+                fixedHeaderContent(
+                  columns,
+                  handleSelectAll,
+                  isAllSelected,
+                  selectedItems
+                )
+              }
               components={VirtuosoTableComponents}
               itemContent={itemContent}
               totalCount={items.length}
             />
             <Grid container justifyContent="center" flexDirection="column">
               <Divider />
-              <Grid item p={2}>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={/* rows.length */ 10}
+                rowsPerPage={/* rowsPerPage */ 10}
+                page={/* page */ 1}
+                onPageChange={/* handleChangePage */ () => {}}
+                onRowsPerPageChange={/* handleChangeRowsPerPage */ () => {}}
+              />
+              {/* <Grid item p={2}>
                 <Grid container justifyContent="flex-end">
                   <Grid item>
                     <Typography
-                      variant="subtitle1"
+                      variant="subtitle2"
                       color="text.primary"
                       sx={{ mt: 1 }}
                     >
@@ -322,7 +347,7 @@ export default function DataGrid({
                     </Typography>
                   </Grid>
                 </Grid>
-              </Grid>
+              </Grid> */}
             </Grid>
           </React.Fragment>
         ) : error ? (

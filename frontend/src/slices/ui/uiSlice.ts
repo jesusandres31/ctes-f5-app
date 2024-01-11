@@ -63,7 +63,14 @@ const ui = createSlice({
     resetSnackbar(state: IUIState) {
       state.snackbar.open = false;
     },
-    setSelectedItems(state: IUIState, { payload }: PayloadAction<string>) {
+    setSelectedItems(
+      state: IUIState,
+      { payload }: PayloadAction<string | string[]>
+    ) {
+      if (Array.isArray(payload)) {
+        state.selectedItems = payload;
+        return;
+      }
       if (state.selectedItems.includes(payload)) {
         state.selectedItems = state.selectedItems.filter(
           (id) => id !== payload

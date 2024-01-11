@@ -18,6 +18,7 @@ import {
   darken,
   ListSubheader,
   Grid,
+  lighten,
 } from "@mui/material";
 import {
   KeyboardDoubleArrowDownRounded,
@@ -33,15 +34,17 @@ import { useIsMobile } from "src/hooks";
 
 const DRAWER_WIDTH = 230;
 
+const smallIconStyle = { fontSize: "30px", marginLeft: "-3.5px" };
+
 const MENU_ITEMS_FIRST: IMenuItem[] = [
   {
     text: "Ingresos",
-    icon: <KeyboardDoubleArrowDownRounded />,
+    icon: <KeyboardDoubleArrowDownRounded sx={smallIconStyle} />,
     to: AppRoutes.Incomes,
   },
   {
     text: "Egresos",
-    icon: <KeyboardDoubleArrowUpRounded />,
+    icon: <KeyboardDoubleArrowUpRounded sx={smallIconStyle} />,
     to: AppRoutes.Expenses,
   },
 ];
@@ -114,17 +117,26 @@ const CustomList = ({ items, subheader }: CustomListProps) => {
               <ListItemIcon
                 sx={{
                   minWidth: "40px",
-                  // color: theme.palette.text.secondary,
-                  color: theme.palette.primary.light,
-                  // color: isSelected(item.to)
-                  //   ? lighten(theme.palette.primary.main, 0.15)
-                  //   : theme.palette.text.secondary,
+                  color: isSelected(item.to)
+                    ? lighten(theme.palette.primary.main, 0.1)
+                    : lighten(theme.palette.text.secondary, 0.3),
                 }}
               >
                 {item.icon}
               </ListItemIcon>
             </Box>
-            <ListItemText primary={item.text} />
+            <ListItemText
+              primary={
+                <Typography
+                  variant="subtitle2"
+                  color={
+                    isSelected(item.to) ? "text.primary" : "text.secondary"
+                  }
+                >
+                  {item.text}
+                </Typography>
+              }
+            />
           </ListItemButton>
         </ListItem>
       ))}
@@ -133,21 +145,26 @@ const CustomList = ({ items, subheader }: CustomListProps) => {
 };
 
 const CustomDrawer = () => {
-  const theme = useTheme();
+  /* const theme = useTheme(); */
 
   return (
     <div>
-      <Toolbar sx={{ backgroundColor: theme.palette.primary.main }}>
+      <Toolbar
+        sx={{
+          /* backgroundColor: theme.palette.primary.main */ backgroundColor:
+            "text.primary",
+        }}
+      >
         {/* <SportsSoccerRounded sx={{ color: "background.default" }} /> */}
         <Typography variant="subtitle1" color="background.default">
           {`\xa0Ctes F5 v${version}`}
         </Typography>
       </Toolbar>
-      <Box px={1}>
+      <Box px={1} pt={1}>
         <CustomList items={MENU_ITEMS_FIRST} subheader="Main Dashboard" />
       </Box>
       <Divider variant="middle" />
-      <Box px={1}>
+      <Box px={1} pt={1}>
         <CustomList items={MENU_ITEMS_SECOND} subheader="More Options" />
       </Box>
     </div>
@@ -172,6 +189,7 @@ export default function Dashboard() {
           boxShadow: 0,
           width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
           ml: { sm: `${DRAWER_WIDTH}px` },
+          backgroundColor: "text.primary",
         }}
       >
         <Toolbar>
