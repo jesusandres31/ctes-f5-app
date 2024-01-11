@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
 import {
   TableRow,
@@ -9,13 +9,10 @@ import {
   Table,
   Divider,
   Grid,
-  IconButton,
   Toolbar,
-  Tooltip,
   Typography,
   Button,
   Checkbox,
-  Container,
 } from "@mui/material";
 import { useRouter } from "src/hooks/useRouter";
 import { IColumn } from "src/types";
@@ -33,6 +30,13 @@ import {
   DeleteForeverRounded,
 } from "@mui/icons-material";
 import { useIsMobile } from "src/hooks";
+import {
+  isSelected,
+  resetSelectedItems,
+  setSelectedItems,
+  useUISelector,
+} from "src/slices/ui/uiSlice";
+import { useAppDispatch } from "src/app/store";
 
 type Item = GetExpenseRes | GetExpenseConceptRes;
 
@@ -53,37 +57,20 @@ const translateTitle = (title: string) => {
 };
 
 /**
- * Virtualized table components
+ * Components:
  */
-const VirtuosoTableComponents: TableComponents<Item, IColumn<Item>[]> = {
-  Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
-    <TableContainer {...props} ref={ref} />
-  )),
-  Table: (props) => (
-    <Table
-      {...props}
-      sx={{
-        borderCollapse: "separate",
-        tableLayout: "fixed",
-      }}
-    />
-  ),
-  TableHead,
-  TableRow: ({ item: _item, ...props }) => <TableRow selected {...props} />,
-  TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
-    <TableBody {...props} ref={ref} />
-  )),
-};
-
-function fixedHeaderContent(columns: Column): React.ReactNode {
+function fixedHeaderContent(
+  columns: Column,
+  handleSelectAll: Function
+): React.ReactNode {
   return (
     <TableRow>
       <TableCell padding="checkbox">
         <Checkbox
           color="primary"
           /* indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick} */
+            checked={rowCount > 0 && numSelected === rowCount} */
+          onChange={handleSelectAll}
           inputProps={{
             "aria-label": "select all desserts",
           }}
@@ -118,8 +105,11 @@ function rowContent(
 ) {
   return (
     <>
-      {/* <TableRow selected={isSelected} onClick={() => handleSelectItem(row.id)}> */}
-      <TableCell padding="checkbox" sx={{ cursor: "pointer" }}>
+      <TableCell
+        padding="checkbox"
+        sx={{ cursor: "pointer" }}
+        onClick={() => handleSelectItem(row.id)}
+      >
         <Checkbox color="primary" checked={isSelected} />
       </TableCell>
       {columns.map((column) => {
@@ -136,6 +126,7 @@ function rowContent(
             key={column.id}
             align={column.align ?? "right"}
             sx={{ cursor: "pointer" }}
+            onClick={() => handleSelectItem(row.id)}
           >
             {/* <Tooltip title={value}> */}
             <Typography
@@ -156,7 +147,6 @@ function rowContent(
           </TableCell>
         );
       })}
-      {/*  </TableRow> */}
     </>
   );
 }
@@ -253,28 +243,54 @@ export default function DataGrid({
   columns,
   ...rest
 }: DataGridProps) {
+  const dispatch = useAppDispatch();
   const { route } = useRouter();
+  const { selectedItems } = useUISelector((state) => state.ui);
 
   useEffect(() => {
-    setSelectedItemIds([]);
+    dispatch(resetSelectedItems());
   }, [route]);
 
-  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
-
   const handleSelectItem = (itemId: string) => {
-    setSelectedItemIds((prevItemIds) => {
-      if (prevItemIds.includes(itemId)) {
-        return prevItemIds.filter((id) => id !== itemId);
-      } else {
-        return [...prevItemIds, itemId];
-      }
-    });
+    dispatch(setSelectedItems(itemId));
   };
 
-  const isSelected = (itemId: string) => {
-    if (!selectedItemIds) return false;
-    return selectedItemIds.some((selectedItem) => selectedItem === itemId);
+  const handleSelectAll = () => {
+    dispatch(setSelectedItems(items?.map((item) => item.id) || []));
   };
+
+  const VirtuosoTableComponents: TableComponents<Item> = {
+    Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
+      <TableContainer {...props} ref={ref} />
+    )),
+    Table: (props) => (
+      <Table
+        {...props}
+        sx={{
+          borderCollapse: "separate",
+          tableLayout: "fixed",
+        }}
+      />
+    ),
+    TableHead,
+    TableRow: ({ item: _item, ...props }) => {
+      return (
+        <TableRow selected={isSelected(selectedItems, _item.id)} {...props} />
+      );
+    },
+    TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
+      <TableBody {...props} ref={ref} />
+    )),
+  };
+
+  const itemContent = (_index: number, row: Item) =>
+    rowContent(
+      _index,
+      row,
+      columns as IColumn<Item>[],
+      isSelected(selectedItems, row.id),
+      handleSelectItem
+    );
 
   return (
     <PageContainer>
@@ -287,17 +303,9 @@ export default function DataGrid({
                 flex: "1 1 auto",
               }}
               data={items}
-              components={VirtuosoTableComponents}
               fixedHeaderContent={() => fixedHeaderContent(columns)}
-              itemContent={(_index, row) =>
-                rowContent(
-                  _index,
-                  row,
-                  columns as IColumn<Item>[],
-                  isSelected(row.id),
-                  handleSelectItem
-                )
-              }
+              components={VirtuosoTableComponents}
+              itemContent={itemContent}
               totalCount={items.length}
             />
             <Grid container justifyContent="center" flexDirection="column">

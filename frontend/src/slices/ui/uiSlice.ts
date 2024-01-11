@@ -19,6 +19,7 @@ interface IUIState {
   collapse: number | null;
   navbar: string | null;
   snackbar: ISnackbar;
+  selectedItems: string[];
 }
 
 const initialState: IUIState = {
@@ -30,10 +31,15 @@ const initialState: IUIState = {
     type: "success",
     open: false,
   },
+  selectedItems: [],
 };
 
 export const isCollapsed = (collapsedItems: ICollapse[], itemId: number) => {
   return collapsedItems.some((item) => item.id === itemId);
+};
+
+export const isSelected = (selectedItems: string[], itemId: string) => {
+  return selectedItems.some((selectedItem) => selectedItem === itemId);
 };
 
 const ui = createSlice({
@@ -57,6 +63,18 @@ const ui = createSlice({
     resetSnackbar(state: IUIState) {
       state.snackbar.open = false;
     },
+    setSelectedItems(state: IUIState, { payload }: PayloadAction<string>) {
+      if (state.selectedItems.includes(payload)) {
+        state.selectedItems = state.selectedItems.filter(
+          (id) => id !== payload
+        );
+      } else {
+        state.selectedItems = [...state.selectedItems, payload];
+      }
+    },
+    resetSelectedItems(state: IUIState) {
+      state.selectedItems = [];
+    },
   },
 });
 
@@ -66,6 +84,8 @@ export const {
   setNavbar,
   setSnackbar,
   resetSnackbar,
+  setSelectedItems,
+  resetSelectedItems,
 } = ui.actions;
 
 export const useUISelector: TypedUseSelectorHook<RootState> = useSelector;
