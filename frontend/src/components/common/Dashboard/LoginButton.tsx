@@ -88,7 +88,7 @@ export default function LoginButton() {
             >
               {item.icon}
             </ListItemIcon>
-            <Typography variant="inherit">{item.text}</Typography>
+            <Typography variant="subtitle2">{item.text}</Typography>
           </MenuItem>
         ))}
       </Menu>
