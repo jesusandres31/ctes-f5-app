@@ -6,11 +6,16 @@
 
 ## credentials
 
+- admin:
+
 ```
 admin@admin.com
 admin123456
 ```
 
-- test user:
-  test@test.com
-  12345678
+- regular user:
+
+```
+test@test.com
+12345678
+```

@@ -16,12 +16,6 @@ const Expenses = lazy(() =>
 const ExpenseConcepts = lazy(() =>
   import("src/pages").then((module) => ({ default: module.ExpenseConcepts }))
 );
-const Incomes = lazy(() =>
-  import("src/pages").then((module) => ({ default: module.Incomes }))
-);
-const IncomeConcepts = lazy(() =>
-  import("src/pages").then((module) => ({ default: module.IncomeConcepts }))
-);
 
 const privateRoutes = [
   {
@@ -31,14 +25,6 @@ const privateRoutes = [
   {
     route: AppRoutes.ExpenseConcepts,
     render: <ExpenseConcepts />,
-  },
-  {
-    route: AppRoutes.Incomes,
-    render: <Incomes />,
-  },
-  {
-    route: AppRoutes.IncomeConcepts,
-    render: <IncomeConcepts />,
   },
 ];
 

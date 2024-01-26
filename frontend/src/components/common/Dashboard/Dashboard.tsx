@@ -18,10 +18,8 @@ import {
   darken,
   ListSubheader,
   Grid,
-  lighten,
 } from "@mui/material";
 import {
-  FileDownloadRounded,
   MenuRounded,
   PresentToAllRounded,
   FileUploadRounded,
@@ -29,34 +27,27 @@ import {
 import { AppRoutes, version } from "src/config";
 import { useRouter } from "src/hooks/useRouter";
 import LoginButton from "./LoginButton";
-import { IMenuItem } from "src/types";
+import { DrawerSection, IMenuItem } from "src/types";
 import { useIsMobile } from "src/hooks";
+import { translateTitle } from "src/constants";
 
 const DRAWER_WIDTH = 230;
 
-const MENU_ITEMS_FIRST: IMenuItem[] = [
+const DRAWER_SECTIONS: DrawerSection[] = [
   {
-    text: "Ingresos",
-    icon: <FileDownloadRounded />,
-    to: AppRoutes.Incomes,
-  },
-  {
-    text: "Egresos",
-    icon: <FileUploadRounded />,
-    to: AppRoutes.Expenses,
-  },
-];
-
-const MENU_ITEMS_SECOND: IMenuItem[] = [
-  {
-    text: "Concept. Ingreso",
-    icon: <PresentToAllRounded sx={{ transform: "rotate(180deg)" }} />,
-    to: AppRoutes.IncomeConcepts,
-  },
-  {
-    text: "Concept. Egresos",
-    icon: <PresentToAllRounded />,
-    to: AppRoutes.ExpenseConcepts,
+    title: "Egresos",
+    menuItems: [
+      {
+        text: "Egresos",
+        icon: <FileUploadRounded />,
+        to: AppRoutes.Expenses,
+      },
+      {
+        text: "Concept. Egresos",
+        icon: <PresentToAllRounded />,
+        to: AppRoutes.ExpenseConcepts,
+      },
+    ],
   },
 ];
 
@@ -119,9 +110,10 @@ const CustomList = ({ items, subheader }: CustomListProps) => {
               <ListItemIcon
                 sx={{
                   minWidth: "40px",
-                  color: isSelected(item.to)
-                    ? theme.palette.primary.main
-                    : lighten(theme.palette.text.secondary, 0.2),
+                  // color: isSelected(item.to)
+                  //   ? theme.palette.primary.main
+                  //   : lighten(theme.palette.text.secondary, 0.2),
+                  color: theme.palette.primary.main,
                 }}
               >
                 {item.icon}
@@ -164,13 +156,14 @@ const CustomDrawer = () => {
           {`\xa0Ctes F5 v${version}`}
         </Typography>
       </Toolbar>
-      <Box px={1} pt={1}>
-        <CustomList items={MENU_ITEMS_FIRST} subheader="Main Dashboard" />
-      </Box>
-      <Divider variant="middle" />
-      <Box px={1} pt={1}>
-        <CustomList items={MENU_ITEMS_SECOND} subheader="More Options" />
-      </Box>
+      {DRAWER_SECTIONS.map((section, index) => (
+        <>
+          <Box px={1} pt={1}>
+            <CustomList items={section.menuItems} subheader={section.title} />
+          </Box>
+          {index < DRAWER_SECTIONS.length - 1 && <Divider variant="middle" />}
+        </>
+      ))}
     </div>
   );
 };
@@ -178,6 +171,7 @@ const CustomDrawer = () => {
 export default function Dashboard() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { isMobile } = useIsMobile();
+  const { route } = useRouter();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -212,9 +206,9 @@ export default function Dashboard() {
             >
               <MenuRounded />
             </IconButton>
-            {/* <Typography variant="subtitle1" noWrap component="div">
-              {getRouteTitle()}
-            </Typography> */}
+            <Typography variant="subtitle1" noWrap component="div">
+              {translateTitle(route)}
+            </Typography>
           </Grid>
           <Grid
             container

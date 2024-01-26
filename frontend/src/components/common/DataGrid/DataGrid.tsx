@@ -14,19 +14,28 @@ import {
   Button,
   Checkbox,
   TablePagination,
+  IconButton,
+  useTheme,
+  lighten,
+  Tooltip,
 } from "@mui/material";
 import { useRouter } from "src/hooks/useRouter";
-import { IColumn } from "src/types";
+import { GetList, IColumn } from "src/types";
 import { formatNulls } from "src/utils";
 import { Loading, ErrorMsg } from "src/components/common";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import {
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+  FetchBaseQueryMeta,
+  QueryActionCreatorResult,
+} from "@reduxjs/toolkit/query";
 import { SerializedError } from "@reduxjs/toolkit";
 import PageContainer from "../PageContainer/PageContainer";
 import { GetExpenseConceptRes, GetExpenseRes } from "src/interfaces";
 import NoItems from "../NoItems";
-import { AppRoutes } from "src/config";
 import {
-  AddCircleOutlineRounded,
+  AddRounded,
   CreateRounded,
   DeleteForeverRounded,
 } from "@mui/icons-material";
@@ -38,24 +47,14 @@ import {
   useUISelector,
 } from "src/slices/ui/uiSlice";
 import { useAppDispatch } from "src/app/store";
+import { QueryDefinition } from "@reduxjs/toolkit/query";
+import { ListResult } from "pocketbase";
 
 type Item = GetExpenseRes | GetExpenseConceptRes;
 
 // we have to create this Type due to this error message:
 // "The expected type comes from property 'columns' which is declared here on type 'IntrinsicAttributes & DataGridProps'."
 type Column = IColumn<GetExpenseRes>[] | IColumn<GetExpenseConceptRes>[];
-
-// translate title in grid
-const translateTitle = (title: string) => {
-  switch (title) {
-    case AppRoutes.Expenses:
-      return "Egresos";
-    case AppRoutes.ExpenseConcepts:
-      return "Conceptos de Egresos";
-    default:
-      return title;
-  }
-};
 
 /**
  * DataGrid components
@@ -111,12 +110,12 @@ function rowContent(
 ) {
   return (
     <>
-      <TableCell
-        padding="checkbox"
-        sx={{ cursor: "pointer" }}
-        /* onClick={() => handleSelectItem(row.id)} */
-      >
-        <Checkbox color="primary" checked={isSelected} />
+      <TableCell padding="checkbox" sx={{ cursor: "pointer" }}>
+        <Checkbox
+          color="primary"
+          checked={isSelected}
+          onClick={() => handleSelectItem(row.id)}
+        />
       </TableCell>
       {columns.map((column) => {
         const value = column.render
@@ -159,10 +158,12 @@ function rowContent(
 
 interface TableToolbarProps {
   selectedItems: string[];
+  isMobile: boolean;
 }
 
-function TableToolbar({ selectedItems }: TableToolbarProps) {
-  const { route } = useRouter();
+function TableToolbar({ selectedItems, isMobile }: TableToolbarProps) {
+  const theme = useTheme();
+  const isItemsSelected = selectedItems.length > 0;
 
   return (
     <Toolbar
@@ -172,6 +173,9 @@ function TableToolbar({ selectedItems }: TableToolbarProps) {
         flex: "0 0 auto",
         pt: 2,
         pb: 3,
+        backgroundColor: isItemsSelected
+          ? lighten(theme.palette.primary.light, 0.8)
+          : theme.palette.background.paper,
       }}
     >
       <Grid
@@ -181,15 +185,16 @@ function TableToolbar({ selectedItems }: TableToolbarProps) {
         spacing={2}
       >
         <Grid item>
-          <Typography
-            sx={{ flex: "1 1 100%" }}
-            variant="h6"
-            id="tableTitle"
-            component="div"
-            color="text.primary"
-          >
-            {translateTitle(route)}
-          </Typography>
+          {isItemsSelected && (
+            <Typography
+              variant={isMobile ? "subtitle2" : "subtitle1"}
+              id="tableTitle"
+              component="div"
+              color="text.primary"
+            >
+              {`${selectedItems.length} items selected`}
+            </Typography>
+          )}
         </Grid>
         <Grid item>
           <Grid
@@ -199,50 +204,38 @@ function TableToolbar({ selectedItems }: TableToolbarProps) {
             spacing={2}
           >
             <Grid item>
-              <Grid container alignItems="center" sx={{ gap: 2 }}>
+              <Grid container alignItems="center" sx={{ gap: 2, height: 38 }}>
                 {selectedItems.length === 0 && (
                   <CustomButton
-                    color="success"
                     text="Create"
-                    icon={<AddCircleOutlineRounded />}
+                    icon={<AddRounded />}
                     onClick={() => {}}
+                    isMobile={isMobile}
                   />
                 )}
                 {selectedItems.length === 1 && (
-                  <CustomButton
-                    color="info"
+                  <CustomIconButton
                     text="Update"
                     icon={<CreateRounded />}
                     onClick={() => {}}
+                    isMobile={isMobile}
                   />
                 )}
                 {selectedItems.length > 0 && (
-                  <CustomButton
-                    color="error"
+                  <CustomIconButton
                     text="Remove"
                     icon={<DeleteForeverRounded />}
                     onClick={() => {}}
+                    isMobile={isMobile}
                   />
                 )}
               </Grid>
             </Grid>
-            {/* <Grid item>
-              <IconButton onClick={() => {}}>
-                <MoreVertRounded />
-              </IconButton>
-            </Grid> */}
           </Grid>
         </Grid>
       </Grid>
     </Toolbar>
   );
-}
-
-interface DataGridProps {
-  items: Item[] | undefined;
-  error: FetchBaseQueryError | SerializedError | undefined;
-  isLoading: boolean;
-  columns: Column;
 }
 
 // move VirtuosoTableComponents outside DataGrid because it causes a constant re rendering on select item.
@@ -271,21 +264,47 @@ const VirtuosoTableComponents: TableComponents<Item> = {
   )),
 };
 
+interface DataGridProps {
+  data: ListResult<Item> | undefined;
+  error: FetchBaseQueryError | SerializedError | undefined;
+  isLoading: boolean;
+  columns: Column;
+  perPage: number;
+  fetchItemsFunc: (
+    arg: GetList,
+    preferCacheValue?: boolean | undefined
+  ) => QueryActionCreatorResult<
+    QueryDefinition<
+      GetList,
+      BaseQueryFn<
+        string | FetchArgs,
+        unknown,
+        FetchBaseQueryError,
+        {},
+        FetchBaseQueryMeta
+      >,
+      string,
+      ListResult<any>,
+      "api"
+    >
+  >;
+}
+
 export default function DataGrid({
-  items,
+  data,
   error,
   isLoading,
   columns,
+  perPage,
+  fetchItemsFunc,
   ...rest
 }: DataGridProps) {
   const dispatch = useAppDispatch();
   const { route } = useRouter();
   const { selectedItems } = useUISelector((state) => state.ui);
-  const [page, setPage] = React.useState(0);
+  const { isMobile } = useIsMobile();
 
-  const rowsPerPage = 20;
-
-  const isAllSelected = items?.length === selectedItems.length;
+  const isAllSelected = data?.items.length === selectedItems.length;
 
   useEffect(() => {
     dispatch(resetSelectedItems());
@@ -295,12 +314,10 @@ export default function DataGrid({
     e: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
     newPage: number
   ) => {
-    setPage(newPage);
+    const page = newPage + 1; // because pagination starts at 0 in MUI TablePagination.
+    fetchItemsFunc({ page, perPage });
   };
 
-  // const handleSelectItem = (itemId: string) => {
-  //   dispatch(setSelectedItems(itemId));
-  // };
   const handleSelectItem = useCallback(
     (itemId: string) => {
       dispatch(setSelectedItems(itemId));
@@ -310,7 +327,8 @@ export default function DataGrid({
 
   const handleSelectAll = () => {
     if (isAllSelected) return dispatch(resetSelectedItems());
-    if (items) return dispatch(setSelectedItems(items.map((item) => item.id)));
+    if (data?.items)
+      return dispatch(setSelectedItems(data.items.map((item) => item.id)));
   };
 
   const itemContent = (_index: number, row: Item) =>
@@ -322,20 +340,21 @@ export default function DataGrid({
       handleSelectItem
     );
 
-  // TODO: implement pagination and virtualization
-  const pagination = false;
-
   return (
     <PageContainer>
       <>
-        {items && items.length > 0 ? (
+        {data && data.items && data.items.length > 0 ? (
           <React.Fragment>
-            <TableToolbar {...rest} selectedItems={selectedItems} />
+            <TableToolbar
+              {...rest}
+              selectedItems={selectedItems}
+              isMobile={isMobile}
+            />
             <TableVirtuoso
               style={{
                 flex: "1 1 auto",
               }}
-              data={items}
+              data={data.items}
               fixedHeaderContent={() =>
                 fixedHeaderContent(
                   columns,
@@ -346,36 +365,27 @@ export default function DataGrid({
               }
               components={VirtuosoTableComponents}
               itemContent={itemContent}
-              totalCount={items.length}
+              totalCount={data.items.length}
             />
             <Grid container justifyContent="center" flexDirection="column">
               <Divider />
-              {pagination ? (
-                <TablePagination
-                  rowsPerPageOptions={[rowsPerPage]}
-                  component="div"
-                  count={items.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  labelDisplayedRows={(from) =>
-                    `${from.from}-${
-                      from.to === -1 ? from.count : from.to
-                    } ${"of"} ${from.count} items showing`
-                  }
-                  // onRowsPerPageChange={() => {}}
-                />
-              ) : (
-                <Grid item p={2}>
-                  <Grid container justifyContent="flex-end">
-                    <Grid item>
-                      <Typography variant="subtitle2" color="text.primary">
-                        {`Showing ${items.length} items`}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              )}
+              <TablePagination
+                component="div"
+                rowsPerPageOptions={[data.perPage]}
+                count={data.totalItems}
+                rowsPerPage={data.perPage}
+                page={
+                  // - 1 because pagination starts at 0 in MUI TablePagination.
+                  data.page - 1
+                }
+                onPageChange={handleChangePage}
+                labelDisplayedRows={(info) => {
+                  return `Results ${info.from} - ${
+                    info.to === -1 ? info.count : info.to
+                  }, ${"of"} ${data.totalItems} items`;
+                }}
+                // onRowsPerPageChange={() => {}}
+              />
             </Grid>
           </React.Fragment>
         ) : error ? (
@@ -415,8 +425,9 @@ const CustomButton = ({
   text,
   onClick,
   icon,
+  isMobile,
 }: {
-  color:
+  color?:
     | "inherit"
     | "primary"
     | "secondary"
@@ -427,18 +438,41 @@ const CustomButton = ({
   text: string;
   onClick: Function;
   icon: React.ReactNode;
+  isMobile: boolean;
 }) => {
-  const { isMobile } = useIsMobile();
-
   return (
     <Button
-      variant="outlined"
-      color={color}
+      variant="contained"
+      color={color ? color : "primary"}
       size={isMobile ? "small" : "medium"}
       onClick={(e) => onClick(e)}
       startIcon={icon}
     >
       <Typography sx={{ fontWeight: "bold" }}>{text}</Typography>
     </Button>
+  );
+};
+
+const CustomIconButton = ({
+  text,
+  onClick,
+  icon,
+  isMobile,
+}: {
+  text: string;
+  onClick: Function;
+  icon: React.ReactNode;
+  isMobile: boolean;
+}) => {
+  return (
+    <Tooltip title={text}>
+      <IconButton
+        color="primary"
+        size={isMobile ? "small" : "medium"}
+        onClick={(e) => onClick(e)}
+      >
+        {icon}
+      </IconButton>
+    </Tooltip>
   );
 };

@@ -1,7 +1,9 @@
 import { GetExpenseRes } from "src/interfaces";
 import { IColumn } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
-import { useGetExpensesQuery } from "src/app/services/expenseService";
+import { expenseApi } from "src/app/services/expenseService";
+import { PAGE } from "src/constants";
+import { useEffect } from "react";
 
 const columns: IColumn<GetExpenseRes>[] = [
   {
@@ -40,14 +42,24 @@ const columns: IColumn<GetExpenseRes>[] = [
 ];
 
 export default function Expenses() {
-  const { data: expenses, isLoading, error } = useGetExpensesQuery();
+  const [getExpenses, { data, isLoading, error }] =
+    expenseApi.useLazyGetExpensesQuery();
+
+  useEffect(() => {
+    getExpenses({
+      page: PAGE.firstPage,
+      perPage: PAGE.longTable,
+    });
+  }, []);
 
   return (
     <DataGrid
       columns={columns}
-      items={expenses}
+      data={data}
       error={error}
       isLoading={isLoading}
+      perPage={PAGE.shortTable}
+      fetchItemsFunc={getExpenses}
     />
   );
 }

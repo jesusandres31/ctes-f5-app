@@ -6,9 +6,19 @@ export interface IColumn<T> {
   render?: (item: T) => JSX.Element | string | null;
 }
 
+export interface DrawerSection {
+  title: string;
+  menuItems: IMenuItem[];
+}
+
 export interface IMenuItem {
   text: string;
   icon: React.ReactNode;
   to: string;
   onClick?: () => void;
 }
+
+export type GetList = {
+  page: number;
+  perPage: number;
+};

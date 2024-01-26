@@ -1,7 +1,9 @@
 import { GetExpenseConceptRes } from "src/interfaces";
 import { IColumn } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
-import { useGetExpenseConceptsQuery } from "src/app/services/expenseService";
+import { expenseApi } from "src/app/services/expenseService";
+import { PAGE } from "src/constants";
+import { useEffect } from "react";
 
 const columns: IColumn<GetExpenseConceptRes>[] = [
   {
@@ -26,287 +28,24 @@ const columns: IColumn<GetExpenseConceptRes>[] = [
 ];
 
 export default function ExpenseConcepts() {
-  const {
-    data: expenseConcpets,
-    isLoading,
-    error,
-  } = useGetExpenseConceptsQuery();
+  const [getExpenseConcepts, { data, isLoading, error }] =
+    expenseApi.useLazyGetExpenseConceptsQuery();
+
+  useEffect(() => {
+    getExpenseConcepts({
+      page: PAGE.firstPage,
+      perPage: PAGE.longTable,
+    });
+  }, []);
 
   return (
     <DataGrid
       columns={columns}
-      /* items={expenseConcpets} */
-      items={items}
+      data={data}
       error={error}
       isLoading={isLoading}
+      perPage={PAGE.longTable}
+      fetchItemsFunc={getExpenseConcepts}
     />
   );
 }
-
-const items = [
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "h976c291xzr3ahp",
-    name: "pago sueldo",
-    unit_price: 10000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "vmov6zr2n5zamz2",
-    name: "cajon brama",
-    unit_price: 150000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "dl8xmiyhlxjo1zy6",
-    name: "pelota",
-    unit_price: 156,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "h976c291xhzr3ahp",
-    name: "pago sueldo",
-    unit_price: 10000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "vmovgfd6zr2n5zamz2",
-    name: "cajon brama",
-    unit_price: 150000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "dl8xmiyhlfxo1zy6",
-    name: "pelota",
-    unit_price: 156,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "h976cdf291xzr3ahp",
-    name: "pago sueldo",
-    unit_price: 10000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "vmov6zr2an5zamz2",
-    name: "cajon brama",
-    unit_price: 150000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "dl8xmisyhlxo1zy6",
-    name: "pelota",
-    unit_price: 156,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "vmovgfdaa6zr2n5zamz2",
-    name: "cajon brama",
-    unit_price: 150000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "dl8xmiyhlfxdso1zy6",
-    name: "pelota",
-    unit_price: 156,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "h976cdf29fds1xzr3ahp",
-    name: "pago sueldo",
-    unit_price: 10000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "vmov6zfsdr2an5zamz2",
-    name: "cajon brama",
-    unit_price: 150000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "dl8xmisyfdhlxo1zy6",
-    name: "pelota",
-    unit_price: 156,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "dl8xmsy6",
-    name: "pelota",
-    unit_price: 156,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "vmova5zamz2",
-    name: "cajon brama",
-    unit_price: 150000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "dl8xmifo1zy6",
-    name: "pelota",
-    unit_price: 156,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "h976gzr3ahp",
-    name: "pago sueldo",
-    unit_price: 10000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "vmov6zfeamz2",
-    name: "cajon brama",
-    unit_price: 150000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "dlao1zy6",
-    name: "pelota",
-    unit_price: 156,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "dl8xsy6",
-    name: "juujujuju",
-    unit_price: 156,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "vmova5zadmz2",
-    name: "chauuuuu",
-    unit_price: 150000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "dl8xmifoa1zy6",
-    name: "daleeee",
-    unit_price: 156,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "h976gzdr3ahp",
-    name: "re locooo",
-    unit_price: 10000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "vmov6zfeaamz2",
-    name: "jajajajja",
-    unit_price: 150000,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-  {
-    collectionId: "kwdd38162sppmaj",
-    collectionName: "expense_concepts",
-    created: new Date("2024-01-10 20:10:07.220Z"),
-    detail: "",
-    id: "dlao1zyd6",
-    name: "holaaaa",
-    unit_price: 156,
-    updated: new Date("2024-01-07 19:34:33.018Z"),
-  },
-];

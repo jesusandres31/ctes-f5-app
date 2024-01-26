@@ -21,8 +21,6 @@ export enum AppRoutes {
   Unauthorized = "/unauthorized",
   Expenses = "/expenses",
   ExpenseConcepts = "/expense-concepts",
-  Incomes = "/incomes",
-  IncomeConcepts = "/income-concepts",
 }
 
 // general config
