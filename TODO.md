@@ -4,6 +4,6 @@
 - add restrictions in db
 - Concepts: create, update, delete
 
-- search bar
+- search bar. width. make it work
 
 - context menu to ADD button in mobile
