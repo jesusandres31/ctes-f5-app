@@ -18,6 +18,10 @@ import {
   useTheme,
   lighten,
   Tooltip,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  InputAdornment,
 } from "@mui/material";
 import { useRouter } from "src/hooks/useRouter";
 import { GetList, IColumn } from "src/types";
@@ -38,6 +42,8 @@ import {
   AddRounded,
   CreateRounded,
   DeleteForeverRounded,
+  SearchRounded,
+  ClearRounded,
 } from "@mui/icons-material";
 import { useIsMobile } from "src/hooks";
 import {
@@ -49,6 +55,7 @@ import {
 import { useAppDispatch } from "src/app/store";
 import { QueryDefinition } from "@reduxjs/toolkit/query";
 import { ListResult } from "pocketbase";
+import { PAGE } from "src/constants";
 
 type Item = GetExpenseRes | GetExpenseConceptRes;
 
@@ -159,9 +166,14 @@ function rowContent(
 interface TableToolbarProps {
   selectedItems: string[];
   isMobile: boolean;
+  onClickClear: () => void;
 }
 
-function TableToolbar({ selectedItems, isMobile }: TableToolbarProps) {
+function TableToolbar({
+  selectedItems,
+  isMobile,
+  onClickClear,
+}: TableToolbarProps) {
   const theme = useTheme();
   const isItemsSelected = selectedItems.length > 0;
 
@@ -171,8 +183,7 @@ function TableToolbar({ selectedItems, isMobile }: TableToolbarProps) {
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
         flex: "0 0 auto",
-        pt: 2,
-        pb: 3,
+        py: 3,
         backgroundColor: isItemsSelected
           ? lighten(theme.palette.primary.light, 0.8)
           : theme.palette.background.paper,
@@ -185,7 +196,7 @@ function TableToolbar({ selectedItems, isMobile }: TableToolbarProps) {
         spacing={2}
       >
         <Grid item>
-          {isItemsSelected && (
+          {isItemsSelected ? (
             <Typography
               variant={isMobile ? "subtitle2" : "subtitle1"}
               id="tableTitle"
@@ -194,6 +205,28 @@ function TableToolbar({ selectedItems, isMobile }: TableToolbarProps) {
             >
               {`${selectedItems.length} items selected`}
             </Typography>
+          ) : (
+            <FormControl variant="outlined" size="small" sx={{ my: -1 }}>
+              <InputLabel>Search</InputLabel>
+              <OutlinedInput
+                startAdornment={
+                  <InputAdornment
+                    position="start"
+                    sx={{ color: theme.palette.text.disabled }}
+                  >
+                    <SearchRounded />
+                  </InputAdornment>
+                }
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton edge="end" onClick={onClickClear}>
+                      <ClearRounded />
+                    </IconButton>
+                  </InputAdornment>
+                }
+                label="Search"
+              />
+            </FormControl>
           )}
         </Grid>
         <Grid item>
@@ -269,7 +302,6 @@ interface DataGridProps {
   error: FetchBaseQueryError | SerializedError | undefined;
   isLoading: boolean;
   columns: Column;
-  perPage: number;
   fetchItemsFunc: (
     arg: GetList,
     preferCacheValue?: boolean | undefined
@@ -295,7 +327,6 @@ export default function DataGrid({
   error,
   isLoading,
   columns,
-  perPage,
   fetchItemsFunc,
   ...rest
 }: DataGridProps) {
@@ -314,8 +345,10 @@ export default function DataGrid({
     e: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
     newPage: number
   ) => {
-    const page = newPage + 1; // because pagination starts at 0 in MUI TablePagination.
-    fetchItemsFunc({ page, perPage });
+    fetchItemsFunc({
+      page: newPage + 1, // because pagination starts at 0 in MUI TablePagination.
+      perPage: PAGE.rowsPerPage,
+    });
   };
 
   const handleSelectItem = useCallback(
@@ -331,14 +364,9 @@ export default function DataGrid({
       return dispatch(setSelectedItems(data.items.map((item) => item.id)));
   };
 
-  const itemContent = (_index: number, row: Item) =>
-    rowContent(
-      _index,
-      row,
-      columns as IColumn<Item>[],
-      isSelected(selectedItems, row.id),
-      handleSelectItem
-    );
+  const handleClickClear = () => {
+    // do something
+  };
 
   return (
     <PageContainer>
@@ -349,12 +377,14 @@ export default function DataGrid({
               {...rest}
               selectedItems={selectedItems}
               isMobile={isMobile}
+              onClickClear={handleClickClear}
             />
             <TableVirtuoso
               style={{
                 flex: "1 1 auto",
               }}
               data={data.items}
+              components={VirtuosoTableComponents}
               fixedHeaderContent={() =>
                 fixedHeaderContent(
                   columns,
@@ -363,8 +393,15 @@ export default function DataGrid({
                   selectedItems
                 )
               }
-              components={VirtuosoTableComponents}
-              itemContent={itemContent}
+              itemContent={(_index: number, row: Item) =>
+                rowContent(
+                  _index,
+                  row,
+                  columns as IColumn<Item>[],
+                  isSelected(selectedItems, row.id),
+                  handleSelectItem
+                )
+              }
               totalCount={data.items.length}
             />
             <Grid container justifyContent="center" flexDirection="column">

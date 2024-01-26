@@ -34,7 +34,7 @@ export default function ExpenseConcepts() {
   useEffect(() => {
     getExpenseConcepts({
       page: PAGE.firstPage,
-      perPage: PAGE.longTable,
+      perPage: PAGE.rowsPerPage,
     });
   }, []);
 
@@ -44,7 +44,6 @@ export default function ExpenseConcepts() {
       data={data}
       error={error}
       isLoading={isLoading}
-      perPage={PAGE.longTable}
       fetchItemsFunc={getExpenseConcepts}
     />
   );

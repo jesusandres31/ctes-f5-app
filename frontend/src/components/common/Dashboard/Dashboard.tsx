@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import {
   Typography,
@@ -157,12 +157,12 @@ const CustomDrawer = () => {
         </Typography>
       </Toolbar>
       {DRAWER_SECTIONS.map((section, index) => (
-        <>
+        <React.Fragment key={section.title}>
           <Box px={1} pt={1}>
             <CustomList items={section.menuItems} subheader={section.title} />
           </Box>
           {index < DRAWER_SECTIONS.length - 1 && <Divider variant="middle" />}
-        </>
+        </React.Fragment>
       ))}
     </div>
   );

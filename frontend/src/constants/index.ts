@@ -19,8 +19,7 @@ export const MSG = {
  */
 export const PAGE = {
   firstPage: 1,
-  longTable: 500,
-  shortTable: 25,
+  rowsPerPage: 20,
 };
 
 /**

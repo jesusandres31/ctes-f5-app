@@ -1,10 +1,9 @@
 - gitignore pb_data
-- setup husky and automate db backup before push
+- setup husky (linter, formater) and automate db backup before push
 
 - add restrictions in db
-
 - Concepts: create, update, delete
 
 - search bar
 
-- paginated and virtualized table
+- context menu to ADD button in mobile

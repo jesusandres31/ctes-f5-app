@@ -48,7 +48,7 @@ export default function Expenses() {
   useEffect(() => {
     getExpenses({
       page: PAGE.firstPage,
-      perPage: PAGE.longTable,
+      perPage: PAGE.rowsPerPage,
     });
   }, []);
 
@@ -58,7 +58,6 @@ export default function Expenses() {
       data={data}
       error={error}
       isLoading={isLoading}
-      perPage={PAGE.shortTable}
       fetchItemsFunc={getExpenses}
     />
   );
