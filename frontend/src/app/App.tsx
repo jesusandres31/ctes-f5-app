@@ -9,6 +9,7 @@ import {
 } from "src/components/common";
 import { AppRoutes, conf } from "src/config";
 import { useAuth } from "src/hooks";
+import { Box } from "@mui/material";
 
 const Expenses = lazy(() =>
   import("src/pages").then((module) => ({ default: module.Expenses }))
@@ -33,7 +34,13 @@ function App(): JSX.Element {
 
   return (
     <React.Fragment>
-      <Suspense fallback={<Loading />}>
+      <Suspense
+        fallback={
+          <Box sx={{ position: "absolute", top: "50%", left: "50%" }}>
+            <Loading />
+          </Box>
+        }
+      >
         <Routes>
           {/* login routes */}
           <Route

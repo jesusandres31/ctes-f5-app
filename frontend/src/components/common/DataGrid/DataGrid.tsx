@@ -195,7 +195,14 @@ function TableToolbar({
         alignItems="center"
         spacing={2}
       >
-        <Grid item>
+        <Grid
+          item
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            width: isMobile ? 300 : 500,
+          }}
+        >
           {isItemsSelected ? (
             <Typography
               variant={isMobile ? "subtitle2" : "subtitle1"}
@@ -206,7 +213,11 @@ function TableToolbar({
               {`${selectedItems.length} items selected`}
             </Typography>
           ) : (
-            <FormControl variant="outlined" size="small" sx={{ my: -1 }}>
+            <FormControl
+              variant="outlined"
+              size="small"
+              sx={{ my: -1, width: "100%" }}
+            >
               <InputLabel>Search</InputLabel>
               <OutlinedInput
                 startAdornment={
@@ -300,7 +311,7 @@ const VirtuosoTableComponents: TableComponents<Item> = {
 interface DataGridProps {
   data: ListResult<Item> | undefined;
   error: FetchBaseQueryError | SerializedError | undefined;
-  isLoading: boolean;
+  isFetching: boolean;
   columns: Column;
   fetchItemsFunc: (
     arg: GetList,
@@ -325,7 +336,7 @@ interface DataGridProps {
 export default function DataGrid({
   data,
   error,
-  isLoading,
+  isFetching,
   columns,
   fetchItemsFunc,
   ...rest
@@ -358,11 +369,11 @@ export default function DataGrid({
     [dispatch]
   );
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     if (isAllSelected) return dispatch(resetSelectedItems());
     if (data?.items)
       return dispatch(setSelectedItems(data.items.map((item) => item.id)));
-  };
+  }, [isAllSelected, data, dispatch]);
 
   const handleClickClear = () => {
     // do something
@@ -425,17 +436,21 @@ export default function DataGrid({
               />
             </Grid>
           </React.Fragment>
+        ) : data && data.items && data.items.length === 0 ? (
+          <CustomGrid>
+            <NoItems />
+          </CustomGrid>
         ) : error ? (
           <CustomGrid>
             <ErrorMsg />
           </CustomGrid>
-        ) : isLoading ? (
+        ) : isFetching ? (
           <CustomGrid>
             <Loading />
           </CustomGrid>
         ) : (
           <CustomGrid>
-            <NoItems />
+            <></>
           </CustomGrid>
         )}
       </>

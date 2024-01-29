@@ -28,7 +28,7 @@ const columns: IColumn<GetExpenseConceptRes>[] = [
 ];
 
 export default function ExpenseConcepts() {
-  const [getExpenseConcepts, { data, isLoading, error }] =
+  const [getExpenseConcepts, { data, isFetching, error }] =
     expenseApi.useLazyGetExpenseConceptsQuery();
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function ExpenseConcepts() {
       columns={columns}
       data={data}
       error={error}
-      isLoading={isLoading}
+      isFetching={isFetching}
       fetchItemsFunc={getExpenseConcepts}
     />
   );
