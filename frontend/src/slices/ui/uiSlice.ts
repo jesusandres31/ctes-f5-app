@@ -2,6 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useSelector, TypedUseSelectorHook } from "react-redux";
 import { AlertColor } from "@mui/material";
 import { RootState } from "src/app/store";
+import { Order } from "src/types";
+import { PAGE } from "src/constants";
 
 interface ICollapse {
   id: number;
@@ -20,6 +22,11 @@ interface IUIState {
   navbar: string | null;
   snackbar: ISnackbar;
   selectedItems: string[];
+  page: number;
+  perPage: number;
+  filter: string;
+  order: Order;
+  orderBy: string;
 }
 
 const initialState: IUIState = {
@@ -32,6 +39,11 @@ const initialState: IUIState = {
     open: false,
   },
   selectedItems: [],
+  page: PAGE.firstPage,
+  perPage: PAGE.rowsPerPage,
+  filter: "",
+  order: "desc",
+  orderBy: "",
 };
 
 export const isCollapsed = (collapsedItems: ICollapse[], itemId: number) => {
@@ -79,8 +91,27 @@ const ui = createSlice({
         state.selectedItems = [...state.selectedItems, payload];
       }
     },
+
+    setFilter(state: IUIState, { payload }: PayloadAction<string>) {
+      state.filter = payload;
+    },
+    toggleSortDirection(state: IUIState) {
+      state.order = state.order === "asc" ? "desc" : "asc";
+    },
+    setOrderBy(state: IUIState, { payload }: PayloadAction<string>) {
+      state.orderBy = payload;
+    },
+    setPage(state: IUIState, { payload }: PayloadAction<number>) {
+      state.page = payload;
+    },
     resetSelectedItems(state: IUIState) {
-      state.selectedItems = [];
+      state.selectedItems = initialState.selectedItems;
+    },
+    resetFilter(state: IUIState) {
+      state.filter = initialState.filter;
+    },
+    resetPage(state: IUIState) {
+      state.page = initialState.page;
     },
   },
 });
@@ -92,7 +123,13 @@ export const {
   setSnackbar,
   resetSnackbar,
   setSelectedItems,
+  setFilter,
+  toggleSortDirection,
+  setOrderBy,
+  setPage,
   resetSelectedItems,
+  resetFilter,
+  resetPage,
 } = ui.actions;
 
 export const useUISelector: TypedUseSelectorHook<RootState> = useSelector;

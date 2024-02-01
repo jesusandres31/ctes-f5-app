@@ -2,10 +2,11 @@ import { GetExpenseRes } from "src/interfaces";
 import { IColumn } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
 import { expenseApi } from "src/app/services/expenseService";
-import { PAGE } from "src/constants";
-import { useEffect } from "react";
+import { formatDate } from "src/utils";
 
-const columns: IColumn<GetExpenseRes>[] = [
+const DEFAULT_ORDER_BY: keyof GetExpenseRes = "created";
+
+const COLUMNS: IColumn<GetExpenseRes>[] = [
   {
     minWidth: 150,
     label: "Concepto",
@@ -39,25 +40,26 @@ const columns: IColumn<GetExpenseRes>[] = [
     align: "right",
     render: (item) => `$ ${item.total}`,
   },
+  {
+    minWidth: 100,
+    label: "Fecha Creación",
+    id: "created",
+    align: "right",
+    render: (item) => formatDate(item.created),
+  },
 ];
 
 export default function Expenses() {
   const [getExpenses, { data, isFetching, error }] =
     expenseApi.useLazyGetExpensesQuery();
 
-  useEffect(() => {
-    getExpenses({
-      page: PAGE.firstPage,
-      perPage: PAGE.rowsPerPage,
-    });
-  }, []);
-
   return (
     <DataGrid
-      columns={columns}
       data={data}
       error={error}
       isFetching={isFetching}
+      columns={COLUMNS}
+      defaultOrderBy={DEFAULT_ORDER_BY}
       fetchItemsFunc={getExpenses}
     />
   );

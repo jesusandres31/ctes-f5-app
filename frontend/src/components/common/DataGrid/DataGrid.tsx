@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useEffect } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
 import {
   TableRow,
@@ -22,9 +22,10 @@ import {
   InputLabel,
   OutlinedInput,
   InputAdornment,
+  debounce,
+  TableSortLabel,
 } from "@mui/material";
-import { useRouter } from "src/hooks/useRouter";
-import { GetList, IColumn } from "src/types";
+import { Column, GetList, IColumn, Item } from "src/types";
 import { formatNulls } from "src/utils";
 import { Loading, ErrorMsg } from "src/components/common";
 import {
@@ -36,7 +37,6 @@ import {
 } from "@reduxjs/toolkit/query";
 import { SerializedError } from "@reduxjs/toolkit";
 import PageContainer from "../PageContainer/PageContainer";
-import { GetExpenseConceptRes, GetExpenseRes } from "src/interfaces";
 import NoItems from "../NoItems";
 import {
   AddRounded,
@@ -48,20 +48,21 @@ import {
 import { useIsMobile } from "src/hooks";
 import {
   isSelected,
+  resetFilter,
+  resetPage,
   resetSelectedItems,
+  setFilter,
+  setOrderBy,
+  setPage,
   setSelectedItems,
+  setSnackbar,
+  toggleSortDirection,
   useUISelector,
 } from "src/slices/ui/uiSlice";
 import { useAppDispatch } from "src/app/store";
 import { QueryDefinition } from "@reduxjs/toolkit/query";
 import { ListResult } from "pocketbase";
-import { PAGE } from "src/constants";
-
-type Item = GetExpenseRes | GetExpenseConceptRes;
-
-// we have to create this Type due to this error message:
-// "The expected type comes from property 'columns' which is declared here on type 'IntrinsicAttributes & DataGridProps'."
-type Column = IColumn<GetExpenseRes>[] | IColumn<GetExpenseConceptRes>[];
+import { useRouter } from "src/hooks/useRouter";
 
 /**
  * DataGrid components
@@ -70,8 +71,12 @@ function fixedHeaderContent(
   columns: Column,
   handleSelectAll: (e: ChangeEvent<HTMLInputElement>) => void,
   isAllSelected: boolean,
-  selectedItems: string[]
+  selectedItems: string[],
+  items: Item[] | undefined,
+  handleSortTable: (columnId: string) => void
 ): React.ReactNode {
+  const { orderBy, order } = useUISelector((state) => state.ui);
+
   return (
     <TableRow>
       <TableCell
@@ -80,7 +85,7 @@ function fixedHeaderContent(
       >
         <Checkbox
           color="primary"
-          checked={isAllSelected}
+          checked={items && items.length > 0 && isAllSelected}
           indeterminate={selectedItems.length > 0 && !isAllSelected}
           onChange={handleSelectAll}
           inputProps={{
@@ -98,10 +103,18 @@ function fixedHeaderContent(
           sx={{
             backgroundColor: "background.paper",
           }}
+          sortDirection={orderBy === column.id ? order : false}
         >
-          <Typography variant="body2" fontWeight="bold">
-            {column.label}
-          </Typography>
+          <TableSortLabel
+            active={orderBy === column.id}
+            direction={orderBy === column.id ? order : "asc"}
+            /* onClick={createSortHandler(column.id)} */
+            onClick={() => handleSortTable(column.id)}
+          >
+            <Typography variant="body2" fontWeight="bold">
+              {column.label}
+            </Typography>
+          </TableSortLabel>
         </TableCell>
       ))}
     </TableRow>
@@ -167,15 +180,18 @@ interface TableToolbarProps {
   selectedItems: string[];
   isMobile: boolean;
   onClickClear: () => void;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 function TableToolbar({
   selectedItems,
   isMobile,
   onClickClear,
+  onChange,
 }: TableToolbarProps) {
   const theme = useTheme();
   const isItemsSelected = selectedItems.length > 0;
+  const { filter } = useUISelector((state) => state.ui);
 
   return (
     <Toolbar
@@ -220,6 +236,8 @@ function TableToolbar({
             >
               <InputLabel>Search</InputLabel>
               <OutlinedInput
+                value={filter}
+                onChange={onChange}
                 startAdornment={
                   <InputAdornment
                     position="start"
@@ -313,6 +331,7 @@ interface DataGridProps {
   error: FetchBaseQueryError | SerializedError | undefined;
   isFetching: boolean;
   columns: Column;
+  defaultOrderBy: string;
   fetchItemsFunc: (
     arg: GetList,
     preferCacheValue?: boolean | undefined
@@ -338,28 +357,52 @@ export default function DataGrid({
   error,
   isFetching,
   columns,
+  defaultOrderBy,
   fetchItemsFunc,
   ...rest
 }: DataGridProps) {
   const dispatch = useAppDispatch();
   const { route } = useRouter();
-  const { selectedItems } = useUISelector((state) => state.ui);
+  const { selectedItems, filter, order, orderBy, page, perPage } =
+    useUISelector((state) => state.ui);
   const { isMobile } = useIsMobile();
+  const [filterFlag, setFilterFlag] = useState<string>("");
 
   const isAllSelected = data?.items.length === selectedItems.length;
 
   useEffect(() => {
+    dispatch(resetPage());
+    dispatch(resetFilter());
     dispatch(resetSelectedItems());
+    dispatch(setOrderBy(defaultOrderBy));
   }, [route]);
+
+  useEffect(() => {
+    const handleFetchItems = async () => {
+      try {
+        await fetchItemsFunc({
+          page,
+          perPage,
+          filter,
+          order,
+          orderBy,
+        });
+      } catch (err: any) {
+        dispatch(setSnackbar({ message: err.data.error, type: "error" }));
+      }
+    };
+    // validation to prevent multiple fetches on initial render.
+    if (orderBy === defaultOrderBy) {
+      handleFetchItems();
+    }
+  }, [order, orderBy, page, filterFlag]);
 
   const handleChangePage = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
     newPage: number
   ) => {
-    fetchItemsFunc({
-      page: newPage + 1, // because pagination starts at 0 in MUI TablePagination.
-      perPage: PAGE.rowsPerPage,
-    });
+    // because pagination starts at 0 in MUI TablePagination.
+    dispatch(setPage(newPage + 1));
   };
 
   const handleSelectItem = useCallback(
@@ -375,84 +418,113 @@ export default function DataGrid({
       return dispatch(setSelectedItems(data.items.map((item) => item.id)));
   }, [isAllSelected, data, dispatch]);
 
+  const debounceFetchItems = useCallback(
+    debounce(async (filter: string) => {
+      // force trigger a new fetch by changing the filterFlag state
+      // that is part of the array of dependencies of the useEffect.
+      setFilterFlag(filter);
+    }, 300),
+    []
+  );
+
+  const handleSetFilter = async (filter: string) => {
+    dispatch(setFilter(filter));
+    debounceFetchItems(filter);
+  };
+
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    const filter = e.currentTarget.value;
+    handleSetFilter(filter);
+  };
+
   const handleClickClear = () => {
-    // do something
+    if (filter) {
+      handleSetFilter("");
+    }
+  };
+
+  const handleSortTable = (columnId: string) => {
+    if (orderBy === columnId) {
+      return dispatch(toggleSortDirection());
+    }
+    dispatch(setOrderBy(columnId));
   };
 
   return (
     <PageContainer>
       <>
-        {data && data.items && data.items.length > 0 ? (
-          <React.Fragment>
-            <TableToolbar
-              {...rest}
-              selectedItems={selectedItems}
-              isMobile={isMobile}
-              onClickClear={handleClickClear}
-            />
-            <TableVirtuoso
-              style={{
-                flex: "1 1 auto",
-              }}
-              data={data.items}
-              components={VirtuosoTableComponents}
-              fixedHeaderContent={() =>
-                fixedHeaderContent(
-                  columns,
-                  handleSelectAll,
-                  isAllSelected,
-                  selectedItems
-                )
-              }
-              itemContent={(_index: number, row: Item) =>
-                rowContent(
-                  _index,
-                  row,
-                  columns as IColumn<Item>[],
-                  isSelected(selectedItems, row.id),
-                  handleSelectItem
-                )
-              }
-              totalCount={data.items.length}
-            />
-            <Grid container justifyContent="center" flexDirection="column">
-              <Divider />
-              <TablePagination
-                component="div"
-                rowsPerPageOptions={[data.perPage]}
-                count={data.totalItems}
-                rowsPerPage={data.perPage}
-                page={
-                  // - 1 because pagination starts at 0 in MUI TablePagination.
-                  data.page - 1
-                }
-                onPageChange={handleChangePage}
-                labelDisplayedRows={(info) => {
-                  return `Results ${info.from} - ${
-                    info.to === -1 ? info.count : info.to
-                  }, ${"of"} ${data.totalItems} items`;
-                }}
-                // onRowsPerPageChange={() => {}}
-              />
-            </Grid>
-          </React.Fragment>
-        ) : data && data.items && data.items.length === 0 ? (
-          <CustomGrid>
-            <NoItems />
-          </CustomGrid>
-        ) : error ? (
-          <CustomGrid>
-            <ErrorMsg />
-          </CustomGrid>
-        ) : isFetching ? (
-          <CustomGrid>
-            <Loading />
-          </CustomGrid>
-        ) : (
-          <CustomGrid>
-            <></>
-          </CustomGrid>
-        )}
+        <TableToolbar
+          {...rest}
+          selectedItems={selectedItems}
+          isMobile={isMobile}
+          onClickClear={handleClickClear}
+          onChange={handleSearch}
+        />
+        <TableVirtuoso
+          style={{
+            flex: "1 1 auto",
+          }}
+          data={data?.items}
+          components={VirtuosoTableComponents}
+          fixedHeaderContent={() =>
+            fixedHeaderContent(
+              columns,
+              handleSelectAll,
+              isAllSelected,
+              selectedItems,
+              data?.items,
+              handleSortTable
+            )
+          }
+          itemContent={(_index: number, row: Item) =>
+            data && data.items && data.items.length > 0 ? (
+              rowContent(
+                _index,
+                row,
+                columns as IColumn<Item>[],
+                isSelected(selectedItems, row.id),
+                handleSelectItem
+              )
+            ) : data && data.items && data.items.length === 0 ? (
+              <CustomGrid>
+                <NoItems />
+              </CustomGrid>
+            ) : error ? (
+              <CustomGrid>
+                <ErrorMsg />
+              </CustomGrid>
+            ) : isFetching ? (
+              <CustomGrid>
+                <Loading />
+              </CustomGrid>
+            ) : (
+              <CustomGrid>
+                <></>
+              </CustomGrid>
+            )
+          }
+          totalCount={data?.items.length}
+        />
+        <Grid container justifyContent="center" flexDirection="column">
+          <Divider />
+          <TablePagination
+            component="div"
+            rowsPerPageOptions={[data?.perPage || 0]}
+            count={data?.totalItems || 0}
+            rowsPerPage={data?.perPage || 0}
+            page={
+              // - 1 because pagination starts at 0 in MUI TablePagination.
+              !data?.totalItems || data?.totalItems <= 0 ? 0 : data?.page - 1
+            }
+            onPageChange={handleChangePage}
+            labelDisplayedRows={(info) => {
+              return `Results ${info.from} - ${
+                info.to === -1 ? info.count : info.to
+              }, ${"of"} ${data?.totalItems} items`;
+            }}
+            // onRowsPerPageChange={() => {}}
+          />
+        </Grid>
       </>
     </PageContainer>
   );

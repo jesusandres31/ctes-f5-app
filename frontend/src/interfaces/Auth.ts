@@ -1,10 +1,3 @@
-// export interface SignUpRes {
-//   accessToken: string;
-//   refreshToken: string;
-// }
-
-// export type RefreshTokenRes = SignUpRes;
-
 interface UserRecord {
   avatar: string;
   collectionId: string;

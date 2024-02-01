@@ -4,4 +4,4 @@
 - add restrictions in db
 - Concepts: create, update, delete
 
-- search bar.
+- sort table.

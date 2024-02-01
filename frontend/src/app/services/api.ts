@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { URL } from "src/config";
+import { Order } from "src/types";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: URL.API,
@@ -64,3 +65,10 @@ export const mainApi = createApi({
   endpoints: () => ({}),
   keepUnusedDataFor: 30,
 });
+
+/**
+ * utils
+ */
+export const getPbOrder = (order: Order) => {
+  return order === "asc" ? "+" : "-";
+};
