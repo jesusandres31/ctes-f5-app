@@ -63,6 +63,7 @@ import { useAppDispatch } from "src/app/store";
 import { QueryDefinition } from "@reduxjs/toolkit/query";
 import { ListResult } from "pocketbase";
 import { useRouter } from "src/hooks/useRouter";
+import { useLocation, useNavigate } from "react-router-dom";
 
 /**
  * DataGrid components
@@ -367,6 +368,7 @@ export default function DataGrid({
     useUISelector((state) => state.ui);
   const { isMobile } = useIsMobile();
   const [filterFlag, setFilterFlag] = useState<string>("");
+  const location = useLocation(); // <-- get current location being accessed
 
   const isAllSelected = data?.items.length === selectedItems.length;
 
@@ -392,7 +394,9 @@ export default function DataGrid({
       }
     };
     // validation to prevent multiple fetches on initial render.
-    if (orderBy === defaultOrderBy) {
+    if (orderBy) {
+      console.log({ location });
+      console.log({ route });
       handleFetchItems();
     }
   }, [order, orderBy, page, filterFlag]);
