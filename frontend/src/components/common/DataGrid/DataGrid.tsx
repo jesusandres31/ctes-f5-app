@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect } from "react";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
 import {
   TableRow,
@@ -9,23 +9,13 @@ import {
   Table,
   Divider,
   Grid,
-  Toolbar,
   Typography,
-  Button,
   Checkbox,
   TablePagination,
-  IconButton,
-  useTheme,
-  lighten,
-  Tooltip,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  InputAdornment,
   debounce,
   TableSortLabel,
 } from "@mui/material";
-import { Column, GetList, IColumn, Item } from "src/types";
+import { Column, GetList, IColumn, Item, Order } from "src/types";
 import { formatNulls } from "src/utils";
 import { Loading, ErrorMsg } from "src/components/common";
 import {
@@ -38,13 +28,6 @@ import {
 import { SerializedError } from "@reduxjs/toolkit";
 import PageContainer from "../PageContainer/PageContainer";
 import NoItems from "../NoItems";
-import {
-  AddRounded,
-  CreateRounded,
-  DeleteForeverRounded,
-  SearchRounded,
-  ClearRounded,
-} from "@mui/icons-material";
 import { useIsMobile } from "src/hooks";
 import {
   isSelected,
@@ -62,12 +45,36 @@ import {
 import { useAppDispatch } from "src/app/store";
 import { QueryDefinition } from "@reduxjs/toolkit/query";
 import { ListResult } from "pocketbase";
-import { useRouter } from "src/hooks/useRouter";
-import { useLocation, useNavigate } from "react-router-dom";
+import TableToolbar from "./content/TableToolbar";
+import { CustomGrid } from "./content/utils";
 
-/**
- * DataGrid components
- */
+// move VirtuosoTableComponents outside DataGrid
+// because it causes a constant re rendering on select item.
+const VirtuosoTableComponents: TableComponents<Item> = {
+  Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
+    <TableContainer {...props} ref={ref} />
+  )),
+  Table: (props) => (
+    <Table
+      {...props}
+      sx={{
+        borderCollapse: "separate",
+        tableLayout: "fixed",
+      }}
+    />
+  ),
+  TableHead,
+  TableRow: ({ item: _item, ...props }) => {
+    const { selectedItems } = useUISelector((state) => state.ui);
+    return (
+      <TableRow selected={isSelected(selectedItems, _item.id)} {...props} />
+    );
+  },
+  TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
+    <TableBody {...props} ref={ref} />
+  )),
+};
+
 function fixedHeaderContent(
   columns: Column,
   handleSelectAll: (e: ChangeEvent<HTMLInputElement>) => void,
@@ -109,7 +116,6 @@ function fixedHeaderContent(
           <TableSortLabel
             active={orderBy === column.id}
             direction={orderBy === column.id ? order : "asc"}
-            /* onClick={createSortHandler(column.id)} */
             onClick={() => handleSortTable(column.id)}
           >
             <Typography variant="body2" fontWeight="bold">
@@ -177,156 +183,6 @@ function rowContent(
   );
 }
 
-interface TableToolbarProps {
-  selectedItems: string[];
-  isMobile: boolean;
-  onClickClear: () => void;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-}
-
-function TableToolbar({
-  selectedItems,
-  isMobile,
-  onClickClear,
-  onChange,
-}: TableToolbarProps) {
-  const theme = useTheme();
-  const isItemsSelected = selectedItems.length > 0;
-  const { filter } = useUISelector((state) => state.ui);
-
-  return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        flex: "0 0 auto",
-        py: 3,
-        backgroundColor: isItemsSelected
-          ? lighten(theme.palette.primary.light, 0.8)
-          : theme.palette.background.paper,
-      }}
-    >
-      <Grid
-        container
-        justifyContent="space-between"
-        alignItems="center"
-        spacing={2}
-      >
-        <Grid
-          item
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            width: isMobile ? 300 : 500,
-          }}
-        >
-          {isItemsSelected ? (
-            <Typography
-              variant={isMobile ? "subtitle2" : "subtitle1"}
-              id="tableTitle"
-              component="div"
-              color="text.primary"
-            >
-              {`${selectedItems.length} items selected`}
-            </Typography>
-          ) : (
-            <FormControl
-              variant="outlined"
-              size="small"
-              sx={{ my: -1, width: "100%" }}
-            >
-              <InputLabel>Search</InputLabel>
-              <OutlinedInput
-                value={filter}
-                onChange={onChange}
-                startAdornment={
-                  <InputAdornment
-                    position="start"
-                    sx={{ color: theme.palette.text.disabled }}
-                  >
-                    <SearchRounded />
-                  </InputAdornment>
-                }
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton edge="end" onClick={onClickClear}>
-                      <ClearRounded />
-                    </IconButton>
-                  </InputAdornment>
-                }
-                label="Search"
-              />
-            </FormControl>
-          )}
-        </Grid>
-        <Grid item>
-          <Grid
-            container
-            justifyContent="space-between"
-            alignItems="center"
-            spacing={2}
-          >
-            <Grid item>
-              <Grid container alignItems="center" sx={{ gap: 2, height: 38 }}>
-                {selectedItems.length === 0 && (
-                  <CustomButton
-                    text="Create"
-                    icon={<AddRounded />}
-                    onClick={() => {}}
-                    isMobile={isMobile}
-                  />
-                )}
-                {selectedItems.length === 1 && (
-                  <CustomIconButton
-                    text="Update"
-                    icon={<CreateRounded />}
-                    onClick={() => {}}
-                    isMobile={isMobile}
-                  />
-                )}
-                {selectedItems.length > 0 && (
-                  <CustomIconButton
-                    text="Remove"
-                    icon={<DeleteForeverRounded />}
-                    onClick={() => {}}
-                    isMobile={isMobile}
-                  />
-                )}
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
-    </Toolbar>
-  );
-}
-
-// move VirtuosoTableComponents outside DataGrid because it causes a constant re rendering on select item.
-const VirtuosoTableComponents: TableComponents<Item> = {
-  Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
-    <TableContainer {...props} ref={ref} />
-  )),
-  Table: (props) => (
-    <Table
-      {...props}
-      sx={{
-        borderCollapse: "separate",
-        tableLayout: "fixed",
-      }}
-    />
-  ),
-  TableHead,
-  TableRow: ({ item: _item, ...props }) => {
-    const { selectedItems } = useUISelector((state) => state.ui);
-    return (
-      <TableRow selected={isSelected(selectedItems, _item.id)} {...props} />
-    );
-  },
-  TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
-    <TableBody {...props} ref={ref} />
-  )),
-};
-
 interface DataGridProps {
   data: ListResult<Item> | undefined;
   error: FetchBaseQueryError | SerializedError | undefined;
@@ -363,12 +219,9 @@ export default function DataGrid({
   ...rest
 }: DataGridProps) {
   const dispatch = useAppDispatch();
-  const { route } = useRouter();
   const { selectedItems, filter, order, orderBy, page, perPage } =
     useUISelector((state) => state.ui);
   const { isMobile } = useIsMobile();
-  const [filterFlag, setFilterFlag] = useState<string>("");
-  const location = useLocation(); // <-- get current location being accessed
 
   const isAllSelected = data?.items.length === selectedItems.length;
 
@@ -377,29 +230,14 @@ export default function DataGrid({
     dispatch(resetFilter());
     dispatch(resetSelectedItems());
     dispatch(setOrderBy(defaultOrderBy));
-  }, [route]);
+  }, []);
 
   useEffect(() => {
-    const handleFetchItems = async () => {
-      try {
-        await fetchItemsFunc({
-          page,
-          perPage,
-          filter,
-          order,
-          orderBy,
-        });
-      } catch (err: any) {
-        dispatch(setSnackbar({ message: err.data.error, type: "error" }));
-      }
-    };
-    // validation to prevent multiple fetches on initial render.
-    if (orderBy) {
-      console.log({ location });
-      console.log({ route });
-      handleFetchItems();
+    // fetch in first render.
+    if (orderBy && orderBy === defaultOrderBy) {
+      handleFetchItems(page, perPage, filter, order, orderBy);
     }
-  }, [order, orderBy, page, filterFlag]);
+  }, [orderBy]);
 
   const handleChangePage = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
@@ -407,6 +245,26 @@ export default function DataGrid({
   ) => {
     // because pagination starts at 0 in MUI TablePagination.
     dispatch(setPage(newPage + 1));
+  };
+
+  const handleFetchItems = async (
+    page: number,
+    perPage: number,
+    filter: string,
+    order: Order,
+    orderBy: string
+  ) => {
+    try {
+      await fetchItemsFunc({
+        page,
+        perPage,
+        filter,
+        order,
+        orderBy,
+      });
+    } catch (err: any) {
+      dispatch(setSnackbar({ message: err.data.error, type: "error" }));
+    }
   };
 
   const handleSelectItem = useCallback(
@@ -424,9 +282,7 @@ export default function DataGrid({
 
   const debounceFetchItems = useCallback(
     debounce(async (filter: string) => {
-      // force trigger a new fetch by changing the filterFlag state
-      // that is part of the array of dependencies of the useEffect.
-      setFilterFlag(filter);
+      handleFetchItems(page, perPage, filter, order, orderBy);
     }, 300),
     []
   );
@@ -448,10 +304,14 @@ export default function DataGrid({
   };
 
   const handleSortTable = (columnId: string) => {
+    const newOrder =
+      orderBy === columnId ? (order === "asc" ? "desc" : "asc") : "desc";
     if (orderBy === columnId) {
-      return dispatch(toggleSortDirection());
+      dispatch(toggleSortDirection());
+    } else {
+      dispatch(setOrderBy(columnId));
     }
-    dispatch(setOrderBy(columnId));
+    handleFetchItems(page, perPage, filter, newOrder, columnId);
   };
 
   return (
@@ -533,74 +393,3 @@ export default function DataGrid({
     </PageContainer>
   );
 }
-
-const CustomGrid = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Grid
-      container
-      justifyContent="center"
-      alignItems="center"
-      sx={{ height: "100%" }}
-      direction="column"
-    >
-      {children}
-    </Grid>
-  );
-};
-
-const CustomButton = ({
-  color,
-  text,
-  onClick,
-  icon,
-  isMobile,
-}: {
-  color?:
-    | "inherit"
-    | "primary"
-    | "secondary"
-    | "success"
-    | "error"
-    | "info"
-    | "warning";
-  text: string;
-  onClick: Function;
-  icon: React.ReactNode;
-  isMobile: boolean;
-}) => {
-  return (
-    <Button
-      variant="contained"
-      color={color ? color : "primary"}
-      size={isMobile ? "small" : "medium"}
-      onClick={(e) => onClick(e)}
-      startIcon={icon}
-    >
-      <Typography sx={{ fontWeight: "bold" }}>{text}</Typography>
-    </Button>
-  );
-};
-
-const CustomIconButton = ({
-  text,
-  onClick,
-  icon,
-  isMobile,
-}: {
-  text: string;
-  onClick: Function;
-  icon: React.ReactNode;
-  isMobile: boolean;
-}) => {
-  return (
-    <Tooltip title={text}>
-      <IconButton
-        color="primary"
-        size={isMobile ? "small" : "medium"}
-        onClick={(e) => onClick(e)}
-      >
-        {icon}
-      </IconButton>
-    </Tooltip>
-  );
-};

@@ -26,7 +26,7 @@ import {
 } from "@mui/icons-material";
 import { AppRoutes, version } from "src/config";
 import { useRouter } from "src/hooks/useRouter";
-import LoginButton from "./LoginButton";
+import LoginButton from "./content/LoginButton";
 import { DrawerSection, IMenuItem } from "src/types";
 import { useIsMobile } from "src/hooks";
 import { translateTitle } from "src/constants";
@@ -197,24 +197,29 @@ export default function Dashboard() {
             justifyContent="flex-start"
             alignItems="center"
           >
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { sm: "none" } }}
-            >
-              <MenuRounded />
-            </IconButton>
-            <Typography variant="subtitle1" noWrap component="div">
-              {translateTitle(route)}
-            </Typography>
+            <Grid item>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleDrawerToggle}
+                sx={{ mr: 2, display: { sm: "none" } }}
+              >
+                <MenuRounded />
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <Typography variant="subtitle1" noWrap component="div">
+                {translateTitle(route)}
+              </Typography>
+            </Grid>
           </Grid>
           <Grid
             container
             direction="row"
             justifyContent="flex-end"
             alignItems="center"
+            sx={{ width: 50 }}
           >
             <LoginButton />
           </Grid>

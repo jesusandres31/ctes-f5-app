@@ -3,5 +3,3 @@
 
 - add restrictions in db
 - Concepts: create, update, delete
-
-- sort table.

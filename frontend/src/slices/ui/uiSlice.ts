@@ -91,7 +91,6 @@ const ui = createSlice({
         state.selectedItems = [...state.selectedItems, payload];
       }
     },
-
     setFilter(state: IUIState, { payload }: PayloadAction<string>) {
       state.filter = payload;
     },
