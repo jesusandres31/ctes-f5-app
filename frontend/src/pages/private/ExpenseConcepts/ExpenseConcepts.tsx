@@ -1,9 +1,7 @@
 import { GetExpenseConceptRes } from "src/interfaces";
-import { IColumn } from "src/types";
+import { Entity, IColumn } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
 import { expenseApi } from "src/app/services/expenseService";
-
-const DEFAULT_ORDER_BY: keyof GetExpenseConceptRes = "name";
 
 const COLUMNS: IColumn<GetExpenseConceptRes>[] = [
   {
@@ -27,6 +25,10 @@ const COLUMNS: IColumn<GetExpenseConceptRes>[] = [
   },
 ];
 
+const DEFAULT_ORDER_BY: keyof GetExpenseConceptRes = "name";
+
+const ENTITY: Entity = "expense_concepts";
+
 export default function ExpenseConcepts() {
   const [getExpenseConcepts, { data, isFetching, error }] =
     expenseApi.useLazyGetExpenseConceptsQuery();
@@ -39,6 +41,7 @@ export default function ExpenseConcepts() {
       columns={COLUMNS}
       defaultOrderBy={DEFAULT_ORDER_BY}
       fetchItemsFunc={getExpenseConcepts}
+      entity={ENTITY}
     />
   );
 }

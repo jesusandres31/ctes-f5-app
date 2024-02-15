@@ -1,16 +1,16 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { URL } from "src/config";
+import { PBOrder } from "src/libs/pocketbase";
 import { Order } from "src/types";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: URL.API,
-  prepareHeaders: (headers) => {
-    /* const accessToken = getAccessToken();
-    if (accessToken) {
-      headers.set(conf.AUTHORIZATION, `${conf.TOKEN_PREFIX} ${accessToken}`);
-    } */
-    return headers;
-  },
+  // baseUrl: URL.API,
+  // prepareHeaders: (headers) => {
+  //   const accessToken = getAccessToken();
+  //   if (accessToken) {
+  //     headers.set(conf.AUTHORIZATION, `${conf.TOKEN_PREFIX} ${accessToken}`);
+  //   }
+  //   return headers;
+  // },
 });
 
 // const baseQueryWithReauth: BaseQueryFn<
@@ -60,7 +60,7 @@ export const ApiTag = {
 };
 
 export const mainApi = createApi({
-  baseQuery /* : baseQueryWithReauth */,
+  baseQuery,
   tagTypes: Object.values(ApiTag),
   endpoints: () => ({}),
   keepUnusedDataFor: 30,
@@ -69,6 +69,6 @@ export const mainApi = createApi({
 /**
  * utils
  */
-export const getPbOrder = (order: Order) => {
+export const getPbOrder = (order: Order): PBOrder => {
   return order === "asc" ? "+" : "-";
 };

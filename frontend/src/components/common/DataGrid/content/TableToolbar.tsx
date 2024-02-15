@@ -18,14 +18,17 @@ import {
   SearchRounded,
   ClearRounded,
 } from "@mui/icons-material";
-import { useUISelector } from "src/slices/ui/uiSlice";
+import { openModal, useUISelector } from "src/slices/ui/uiSlice";
 import { CustomButton, CustomIconButton } from "./utils";
+import { Entity } from "src/types";
+import { useAppDispatch } from "src/app/store";
 
 interface TableToolbarProps {
   selectedItems: string[];
   isMobile: boolean;
   onClickClear: () => void;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  entity: Entity;
 }
 
 export default function TableToolbar({
@@ -33,9 +36,12 @@ export default function TableToolbar({
   isMobile,
   onClickClear,
   onChange,
+  entity,
 }: TableToolbarProps) {
   const theme = useTheme();
-  const isItemsSelected = selectedItems.length > 0;
+  const dispatch = useAppDispatch();
+  const isSomeSelected = selectedItems.length > 0;
+  const isOneSelected = selectedItems.length === 1;
   const { filter } = useUISelector((state) => state.ui);
 
   return (
@@ -45,7 +51,7 @@ export default function TableToolbar({
         pr: { xs: 1, sm: 1 },
         flex: "0 0 auto",
         py: 3,
-        backgroundColor: isItemsSelected
+        backgroundColor: isSomeSelected
           ? lighten(theme.palette.primary.light, 0.8)
           : theme.palette.background.paper,
       }}
@@ -62,9 +68,10 @@ export default function TableToolbar({
           sx={{
             display: "flex",
             alignItems: "center",
+            width: isSomeSelected ? "50%" : "100%",
           }}
         >
-          {isItemsSelected ? (
+          {isSomeSelected ? (
             <Typography
               variant={isMobile ? "subtitle2" : "subtitle1"}
               id="tableTitle"
@@ -74,8 +81,13 @@ export default function TableToolbar({
               {`${selectedItems.length} items selected`}
             </Typography>
           ) : (
-            <Grid container alignItems="center" sx={{ gap: 2 }}>
-              <Grid item /* sx={{ width: "100%" }} */>
+            <Grid
+              container
+              alignItems="center"
+              sx={{ gap: 2, width: "100%" }}
+              direction="row"
+            >
+              <Grid item sx={{ flex: 1, maxWidth: 450 }}>
                 <FormControl
                   variant="outlined"
                   size="small"
@@ -104,16 +116,14 @@ export default function TableToolbar({
                   />
                 </FormControl>
               </Grid>
-              {selectedItems.length === 0 && (
-                <Grid item>
-                  <CustomButton
-                    text="Create"
-                    icon={<AddRounded />}
-                    onClick={() => {}}
-                    isMobile={isMobile}
-                  />
-                </Grid>
-              )}
+              <Grid item>
+                <CustomButton
+                  text="Create"
+                  icon={<AddRounded />}
+                  onClick={() => {}}
+                  isMobile={isMobile}
+                />
+              </Grid>
             </Grid>
           )}
         </Grid>
@@ -124,10 +134,10 @@ export default function TableToolbar({
             alignItems="center"
             spacing={2}
           >
-            {selectedItems.length === 1 || selectedItems.length > 0 ? (
+            {isOneSelected || isSomeSelected ? (
               <Grid item>
                 <Grid container alignItems="center" sx={{ gap: 2 }}>
-                  {selectedItems.length === 1 && (
+                  {isOneSelected && (
                     <CustomIconButton
                       text="Update"
                       icon={<CreateRounded />}
@@ -135,11 +145,13 @@ export default function TableToolbar({
                       isMobile={isMobile}
                     />
                   )}
-                  {selectedItems.length > 0 && (
+                  {isSomeSelected && (
                     <CustomIconButton
                       text="Remove"
                       icon={<DeleteForeverRounded />}
-                      onClick={() => {}}
+                      onClick={() =>
+                        dispatch(openModal({ entity, action: "delete" }))
+                      }
                       isMobile={isMobile}
                     />
                   )}

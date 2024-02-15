@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useSelector, TypedUseSelectorHook } from "react-redux";
 import { AlertColor } from "@mui/material";
 import { RootState } from "src/app/store";
-import { Order } from "src/types";
+import { Action, Entity, Order } from "src/types";
 import { PAGE } from "src/constants";
 
 interface ICollapse {
@@ -16,6 +16,12 @@ interface ISnackbar {
   open?: boolean;
 }
 
+interface IActionModal {
+  create: Entity | null;
+  update: Entity | null;
+  delete: Entity | null;
+}
+
 interface IUIState {
   openDrawer: boolean;
   collapse: number | null;
@@ -27,6 +33,7 @@ interface IUIState {
   filter: string;
   order: Order;
   orderBy: string;
+  actionModal: IActionModal;
 }
 
 const initialState: IUIState = {
@@ -44,6 +51,11 @@ const initialState: IUIState = {
   filter: "",
   order: "desc",
   orderBy: "",
+  actionModal: {
+    create: null,
+    update: null,
+    delete: null,
+  },
 };
 
 export const isCollapsed = (collapsedItems: ICollapse[], itemId: number) => {
@@ -112,6 +124,23 @@ const ui = createSlice({
     resetPage(state: IUIState) {
       state.page = initialState.page;
     },
+    openModal(
+      state: IUIState,
+      { payload }: PayloadAction<{ action: Action; entity: Entity }>
+    ) {
+      if (payload.action === "create") {
+        state.actionModal.create = payload.entity;
+      }
+      if (payload.action === "update") {
+        state.actionModal.update = payload.entity;
+      }
+      if (payload.action === "delete") {
+        state.actionModal.delete = payload.entity;
+      }
+    },
+    closeModal(state: IUIState) {
+      state.actionModal = initialState.actionModal;
+    },
   },
 });
 
@@ -129,6 +158,8 @@ export const {
   resetSelectedItems,
   resetFilter,
   resetPage,
+  openModal,
+  closeModal,
 } = ui.actions;
 
 export const useUISelector: TypedUseSelectorHook<RootState> = useSelector;

@@ -62,5 +62,17 @@ export const expenseApi = mainApi.injectEndpoints({
       },
       providesTags: [ApiTag.ExpenseConcepts],
     }),
+    deleteExpense: build.mutation<PromiseSettledResult<void>[], string[]>({
+      queryFn: async (_arg, _api, _options) => {
+        const items = Array.isArray(_arg) ? _arg : [_arg];
+        const res = await Promise.allSettled(
+          items.map(async (id) => {
+            await pb.collection(ApiTag.Expenses).delete(id);
+          })
+        );
+        return { data: res };
+      },
+      invalidatesTags: [ApiTag.Expenses],
+    }),
   }),
 });

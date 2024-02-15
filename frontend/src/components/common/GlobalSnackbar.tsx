@@ -21,7 +21,7 @@ export default function GlobalSnackbar() {
       onClose={handleClose}
       anchorOrigin={{
         vertical: "bottom",
-        horizontal: "center",
+        horizontal: "right",
       }}
     >
       <Alert

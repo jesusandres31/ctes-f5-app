@@ -1,10 +1,10 @@
 import { GetExpenseRes } from "src/interfaces";
-import { IColumn } from "src/types";
+import { Entity, IColumn } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
 import { expenseApi } from "src/app/services/expenseService";
 import { formatDate } from "src/utils";
-
-const DEFAULT_ORDER_BY: keyof GetExpenseRes = "created";
+import DeleteModal from "src/components/common/Modals/DeleteModal";
+import { useUISelector } from "src/slices/ui/uiSlice";
 
 const COLUMNS: IColumn<GetExpenseRes>[] = [
   {
@@ -49,18 +49,42 @@ const COLUMNS: IColumn<GetExpenseRes>[] = [
   },
 ];
 
+const DEFAULT_ORDER_BY: keyof GetExpenseRes = "created";
+
+const ENTITY: Entity = "expenses";
+
 export default function Expenses() {
+  const { actionModal, selectedItems } = useUISelector((state) => state.ui);
   const [getExpenses, { data, isFetching, error }] =
     expenseApi.useLazyGetExpensesQuery();
+  const [deleteExpense] = expenseApi.useDeleteExpenseMutation();
+
+  const createModalOpen = actionModal.create === ENTITY;
+  const updateModalOpen = actionModal.update === ENTITY;
+  const deleteModalOpen = actionModal.delete === ENTITY;
+  const label = selectedItems.length === 1 ? "egreso" : "egresos";
+
+  const handleDelete = async () => {
+    const res = await deleteExpense(selectedItems).unwrap();
+    /* console.log(res); */
+  };
 
   return (
-    <DataGrid
-      data={data}
-      error={error}
-      isFetching={isFetching}
-      columns={COLUMNS}
-      defaultOrderBy={DEFAULT_ORDER_BY}
-      fetchItemsFunc={getExpenses}
-    />
+    <>
+      <DataGrid
+        data={data}
+        error={error}
+        isFetching={isFetching}
+        columns={COLUMNS}
+        defaultOrderBy={DEFAULT_ORDER_BY}
+        fetchItemsFunc={getExpenses}
+        entity={ENTITY}
+      />
+      <DeleteModal
+        open={deleteModalOpen}
+        label={label}
+        hanleConfirm={handleDelete}
+      />
+    </>
   );
 }

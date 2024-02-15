@@ -15,7 +15,7 @@ import {
   debounce,
   TableSortLabel,
 } from "@mui/material";
-import { Column, GetList, IColumn, Item, Order } from "src/types";
+import { Column, Entity, GetList, IColumn, Item, Order } from "src/types";
 import { formatNulls } from "src/utils";
 import { Loading, ErrorMsg } from "src/components/common";
 import {
@@ -93,7 +93,7 @@ function fixedHeaderContent(
       >
         <Checkbox
           color="primary"
-          checked={items && items.length > 0 && isAllSelected}
+          checked={(items && items.length > 0 && isAllSelected) ?? false}
           indeterminate={selectedItems.length > 0 && !isAllSelected}
           onChange={handleSelectAll}
           inputProps={{
@@ -188,6 +188,7 @@ interface DataGridProps {
   error: FetchBaseQueryError | SerializedError | undefined;
   isFetching: boolean;
   columns: Column;
+  entity: Entity;
   defaultOrderBy: string;
   fetchItemsFunc: (
     arg: GetList,
@@ -214,6 +215,7 @@ export default function DataGrid({
   error,
   isFetching,
   columns,
+  entity,
   defaultOrderBy,
   fetchItemsFunc,
   ...rest
@@ -323,6 +325,7 @@ export default function DataGrid({
           isMobile={isMobile}
           onClickClear={handleClickClear}
           onChange={handleSearch}
+          entity={entity}
         />
         <TableVirtuoso
           style={{
