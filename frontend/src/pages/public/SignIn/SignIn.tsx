@@ -46,6 +46,7 @@ export default function SignIn() {
         formik.setValues(formik.initialValues);
         handleResetError();
       } catch (err: any) {
+        console.log(err);
         dispatch(setSnackbar({ message: err.data.error, type: "error" }));
       }
     },

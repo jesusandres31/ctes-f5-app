@@ -1,10 +1,17 @@
 import { GetExpenseRes } from "src/interfaces";
-import { Entity, IColumn } from "src/types";
+import { Entity, IColumn, PromiseStatus } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
 import { expenseApi } from "src/app/services/expenseService";
 import { formatDate } from "src/utils";
 import DeleteModal from "src/components/common/Modals/DeleteModal";
-import { useUISelector } from "src/slices/ui/uiSlice";
+import {
+  resetSelectedItems,
+  setSnackbar,
+  useUISelector,
+} from "src/slices/ui/uiSlice";
+import { useAppDispatch } from "src/app/store";
+import { MSG } from "src/constants";
+import CreateModal from "src/components/common/Modals/CreateModal";
 
 const COLUMNS: IColumn<GetExpenseRes>[] = [
   {
@@ -54,19 +61,42 @@ const DEFAULT_ORDER_BY: keyof GetExpenseRes = "created";
 const ENTITY: Entity = "expenses";
 
 export default function Expenses() {
+  const dispatch = useAppDispatch();
   const { actionModal, selectedItems } = useUISelector((state) => state.ui);
   const [getExpenses, { data, isFetching, error }] =
     expenseApi.useLazyGetExpensesQuery();
-  const [deleteExpense] = expenseApi.useDeleteExpenseMutation();
+  const [deleteExpense, { isLoading: isDeleting }] =
+    expenseApi.useDeleteExpenseMutation();
 
-  const createModalOpen = actionModal.create === ENTITY;
-  const updateModalOpen = actionModal.update === ENTITY;
-  const deleteModalOpen = actionModal.delete === ENTITY;
-  const label = selectedItems.length === 1 ? "egreso" : "egresos";
+  const MODAL = {
+    create: actionModal.create === ENTITY,
+    update: actionModal.update === ENTITY,
+    delete: actionModal.delete === ENTITY,
+    label: selectedItems.length > 1 ? "Egresos" : "Egreso",
+  };
+
+  const handleCreate = async () => {
+    // const res = await deleteExpense(selectedItems).unwrap();
+    // if (res.every((item) => item.status === PromiseStatus.FULFILLED)) {
+    //   dispatch(resetSelectedItems());
+    //   dispatch(setSnackbar({ message: "Egreso eliminado" }));
+    // }
+  };
+
+  const handleUpdate = async () => {
+    // const res = await deleteExpense(selectedItems).unwrap();
+    // if (res.every((item) => item.status === PromiseStatus.FULFILLED)) {
+    //   dispatch(resetSelectedItems());
+    //   dispatch(setSnackbar({ message: "Egreso eliminado" }));
+    // }
+  };
 
   const handleDelete = async () => {
     const res = await deleteExpense(selectedItems).unwrap();
-    /* console.log(res); */
+    if (res.every((item) => item.status === PromiseStatus.FULFILLED)) {
+      dispatch(resetSelectedItems());
+      dispatch(setSnackbar({ message: MSG.successDelete(res.length) }));
+    }
   };
 
   return (
@@ -81,10 +111,18 @@ export default function Expenses() {
         entity={ENTITY}
       />
       <DeleteModal
-        open={deleteModalOpen}
-        label={label}
+        open={MODAL.delete}
+        label={MODAL.label}
         hanleConfirm={handleDelete}
+        isDeleting={isDeleting}
       />
+      <CreateModal
+        open={MODAL.create}
+        label={MODAL.label}
+        hanleConfirm={handleCreate}
+      >
+        asd
+      </CreateModal>
     </>
   );
 }

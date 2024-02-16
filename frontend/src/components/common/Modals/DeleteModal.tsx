@@ -1,23 +1,27 @@
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
+import {
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
+  Dialog,
+  Button,
+} from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { useAppDispatch } from "src/app/store";
 import { closeModal, useUISelector } from "src/slices/ui/uiSlice";
-import { capitalizeFirst } from "src/utils";
 
 interface DeleteModalProps {
   open: boolean;
   label?: string;
-  hanleConfirm: () => void;
+  hanleConfirm: () => Promise<void>;
+  isDeleting?: boolean;
 }
 
 export default function DeleteModal({
   open,
-  label = "item/s",
+  label = "Item/s",
   hanleConfirm,
+  isDeleting,
 }: DeleteModalProps) {
   const dispatch = useAppDispatch();
   const { selectedItems } = useUISelector((state) => state.ui);
@@ -25,26 +29,30 @@ export default function DeleteModal({
 
   const handleClose = () => dispatch(closeModal());
 
-  const handleDelete = () => {
-    hanleConfirm();
+  const handleDelete = async () => {
+    await hanleConfirm();
     handleClose();
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>{`Eliminar ${capitalizeFirst(label)}`}</DialogTitle>
+      <DialogTitle>{`Eliminar nuevo ${label}`}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          {`Si eliminas ${
-            few ? "estos" : "este"
-          } ${label}, no podrás recuperarlo.`}
+          {`Si eliminas ${few ? "los siguientes" : "el siguiente"} 
+          item${few ? "s" : ""}, no podrás recuperarlo.`}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancelar</Button>
-        <Button onClick={handleDelete} autoFocus variant="contained">
+        <LoadingButton
+          loading={isDeleting}
+          onClick={handleDelete}
+          autoFocus
+          variant="contained"
+        >
           Eliminar
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

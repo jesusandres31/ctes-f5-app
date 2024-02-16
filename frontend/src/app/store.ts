@@ -14,22 +14,35 @@ export const rtkQueryErrorLogger: Middleware =
   ({ dispatch }: MiddlewareAPI) =>
   (next) =>
   (action) => {
-    const actions = Array.isArray(action.payload)
-      ? action.payload
-      : [action.payload];
-    (actions as any[]).forEach((action) => {
-      if (action?.status === PromiseStatus.REJECTED) {
-        dispatch(
-          setSnackbar({
-            message: action.reason.message ?? "Error in request.",
-            type: "error",
-          })
-        );
-      }
-    });
+    const DEF_MSG = "Error in request.";
+    if (action.error) {
+      dispatch(
+        setSnackbar({
+          message: action.error.message ?? DEF_MSG,
+          type: "error",
+        })
+      );
+    } else {
+      const actions = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      (actions as any[]).forEach((action) => {
+        if (action?.status === PromiseStatus.REJECTED) {
+          dispatch(
+            setSnackbar({
+              message: action.reason.message ?? DEF_MSG,
+              type: "error",
+            })
+          );
+        }
+      });
+    }
     return next(action);
   };
 
+/**
+ * store
+ */
 export const createStore = (
   options?: ConfigureStoreOptions["preloadedState"] | undefined
 ) =>

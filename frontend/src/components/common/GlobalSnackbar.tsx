@@ -17,11 +17,11 @@ export default function GlobalSnackbar() {
   return (
     <Snackbar
       open={snackbar.open}
-      autoHideDuration={2500}
+      autoHideDuration={3000}
       onClose={handleClose}
       anchorOrigin={{
         vertical: "bottom",
-        horizontal: "right",
+        horizontal: "center",
       }}
     >
       <Alert

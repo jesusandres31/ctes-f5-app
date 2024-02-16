@@ -239,7 +239,7 @@ export default function DataGrid({
     if (orderBy && orderBy === defaultOrderBy) {
       handleFetchItems(page, perPage, filter, order, orderBy);
     }
-  }, [orderBy]);
+  }, [orderBy, page]);
 
   const handleChangePage = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,

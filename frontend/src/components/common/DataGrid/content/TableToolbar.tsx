@@ -120,7 +120,9 @@ export default function TableToolbar({
                 <CustomButton
                   text="Create"
                   icon={<AddRounded />}
-                  onClick={() => {}}
+                  onClick={() =>
+                    dispatch(openModal({ entity, action: "create" }))
+                  }
                   isMobile={isMobile}
                 />
               </Grid>

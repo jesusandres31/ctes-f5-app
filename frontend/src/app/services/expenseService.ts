@@ -4,17 +4,17 @@ import { pb } from "src/libs";
 import { ListResult } from "pocketbase";
 import { GetList } from "src/types";
 
-const FK = {
-  expense_concept: "expense_concept",
-};
+enum FK {
+  expense_concept = "expense_concept",
+}
 
-const F = {
-  name: "name",
-  detail: "detail",
-  amount: "amount",
-  unit_price: "unit_price",
-  total: "total",
-};
+enum Field {
+  name = "name",
+  detail = "detail",
+  amount = "amount",
+  unit_price = "unit_price",
+  total = "total",
+}
 
 export const expenseApi = mainApi.injectEndpoints({
   endpoints: (build) => ({
@@ -29,12 +29,12 @@ export const expenseApi = mainApi.injectEndpoints({
                 ? `${getPbOrder(_arg.order)}${_arg.orderBy}`
                 : "",
             filter: _arg.filter
-              ? `${F.detail} ~ "${_arg.filter}" ||
-                ${F.detail} ~ "${_arg.filter}" ||
-                ${F.amount} ~ "${_arg.filter}" ||
-                ${F.unit_price} ~ "${_arg.filter}" ||
-                ${F.total} ~ "${_arg.filter}" ||
-                ${FK.expense_concept}.${F.name} ~ "${_arg.filter}"
+              ? `${Field.detail} ~ "${_arg.filter}" ||
+                ${Field.detail} ~ "${_arg.filter}" ||
+                ${Field.amount} ~ "${_arg.filter}" ||
+                ${Field.unit_price} ~ "${_arg.filter}" ||
+                ${Field.total} ~ "${_arg.filter}" ||
+                ${FK.expense_concept}.${Field.name} ~ "${_arg.filter}"
               `
               : "",
           });
@@ -52,9 +52,9 @@ export const expenseApi = mainApi.injectEndpoints({
                 ? `${getPbOrder(_arg.order)}${_arg.orderBy}`
                 : "",
             filter: _arg.filter
-              ? `${F.name} ~ "${_arg.filter}" || 
-                ${F.detail} ~ "${_arg.filter}" ||
-                ${F.unit_price} ~ "${_arg.filter}"
+              ? `${Field.name} ~ "${_arg.filter}" || 
+                ${Field.detail} ~ "${_arg.filter}" ||
+                ${Field.unit_price} ~ "${_arg.filter}"
               `
               : "",
           });
@@ -73,6 +73,21 @@ export const expenseApi = mainApi.injectEndpoints({
         return { data: res };
       },
       invalidatesTags: [ApiTag.Expenses],
+    }),
+    deleteExpenseConcept: build.mutation<
+      PromiseSettledResult<void>[],
+      string[]
+    >({
+      queryFn: async (_arg, _api, _options) => {
+        const items = Array.isArray(_arg) ? _arg : [_arg];
+        const res = await Promise.allSettled(
+          items.map(async (id) => {
+            await pb.collection(ApiTag.ExpenseConcepts).delete(id);
+          })
+        );
+        return { data: res };
+      },
+      invalidatesTags: [ApiTag.ExpenseConcepts],
     }),
   }),
 });

@@ -32,7 +32,3 @@ export const formatNulls = (value: any) => {
   }
   return value;
 };
-
-export function capitalizeFirst(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
