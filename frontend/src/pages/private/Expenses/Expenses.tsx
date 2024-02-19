@@ -10,8 +10,8 @@ import {
   useUISelector,
 } from "src/slices/ui/uiSlice";
 import { useAppDispatch } from "src/app/store";
-import { MSG } from "src/constants";
 import CreateModal from "src/components/common/Modals/CreateModal";
+import { MSG } from "src/utils/FormUtils";
 
 const COLUMNS: IColumn<GetExpenseRes>[] = [
   {

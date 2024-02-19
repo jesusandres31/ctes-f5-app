@@ -3,21 +3,19 @@ import {
   Avatar,
   CssBaseline,
   TextField,
-  Link,
   Box,
   Typography,
   Container,
 } from "@mui/material";
-import { URL } from "src/config";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { SignInReq } from "src/interfaces";
-import { MSG, VLDN } from "src/constants";
 import { removeSpace } from "src/utils";
 import { setSnackbar } from "src/slices/ui/uiSlice";
 import { useAppDispatch } from "src/app/store";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useAuth } from "src/hooks";
+import { MSG, VLDN } from "src/utils/FormUtils";
 
 export default function SignIn() {
   const dispatch = useAppDispatch();

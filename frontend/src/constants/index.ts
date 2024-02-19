@@ -1,24 +1,12 @@
 import { AppRoutes } from "src/config";
-/**
- * validations
- */
-export const VLDN = {
-  EMAIL: { min: 5, max: 60 },
-  PSSWD: { min: 4, max: 50 },
-};
 
 /**
- * messages
+ * style
  */
-const isFew = (length: number) => (length > 1 ? "s" : "");
-
-export const MSG = {
-  required: "Required!",
-  invalidEmail: "Invalid email",
-  minLength: (len: number) => `Enter ${len} characters at least.`,
-  maxLength: (len: number) => `Enter ${len} caracteres maximum.`,
-  successDelete: (length: number) =>
-    `Item${isFew(length)} eliminado${isFew(length)} satisfactoriamente.`,
+export const STYLE = {
+  width: {
+    textfield: 250,
+  },
 };
 
 /**

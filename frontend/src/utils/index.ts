@@ -1,3 +1,5 @@
+import { VLDN } from "./FormUtils";
+
 /**
  * dates
  */
@@ -31,4 +33,15 @@ export const formatNulls = (value: any) => {
     value = "-";
   }
   return value;
+};
+
+/**
+ * validation
+ */
+export const isValidNumber = (value: number | undefined): boolean => {
+  return (
+    value !== undefined &&
+    value < VLDN.FLOAT_NUMBER.max &&
+    value > VLDN.FLOAT_NUMBER.min
+  );
 };

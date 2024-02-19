@@ -23,3 +23,9 @@ export interface GetExpenseRes extends Expense {
 }
 
 export interface GetExpenseConceptRes extends ExpenseConcept {}
+
+export interface CreateExpenseConceptReq {
+  name: string;
+  detail: string;
+  unit_price: number | "";
+}

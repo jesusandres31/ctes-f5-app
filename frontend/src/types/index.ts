@@ -48,3 +48,20 @@ export enum PromiseStatus {
   FULFILLED = "fulfilled",
   REJECTED = "rejected",
 }
+
+/**
+ * form
+ */
+export interface Input {
+  required: boolean;
+  label: string;
+  id: string;
+  value: any;
+  error: string | undefined;
+  max?: number;
+  min?: number;
+  InputProps?: {
+    inputComponent: React.ComponentType<any>;
+    startAdornment: JSX.Element;
+  };
+}
