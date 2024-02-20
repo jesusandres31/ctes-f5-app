@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import { CreateExpenseConceptReq } from "src/interfaces";
 import * as Yup from "yup";
 import { STYLE } from "src/constants";
-import CreateModal from "src/components/common/Modals/CreateModal";
+import CreateOrUpdateModal from "src/components/common/Modals/CreateOrUpdateModal";
 import {
   MSG,
   VLDN,
@@ -11,22 +11,48 @@ import {
   handleSetText,
 } from "src/utils/FormUtils";
 import { useAppDispatch } from "src/app/store";
-import { closeModal, setSnackbar } from "src/slices/ui/uiSlice";
+import { closeModal, setSnackbar, useUISelector } from "src/slices/ui/uiSlice";
 import { expenseConceptApi } from "src/app/services/expenseConceptService";
 import { Input } from "src/types";
+import { useEffect } from "react";
 
-interface CreateOrUpdateExpenseConceptsProps {
+interface CreateOrUpdateExpenseConceptProps {
   open: boolean;
   label: string;
 }
 
-export default function CreateOrUpdateExpenseConcepts({
+export default function CreateOrUpdateExpenseConcept({
   open,
   label,
-}: CreateOrUpdateExpenseConceptsProps) {
+}: CreateOrUpdateExpenseConceptProps) {
   const dispatch = useAppDispatch();
+  const { selectedItems, actionModal } = useUISelector((state) => state.ui);
   const [createExpenseConcept, { isLoading: isCreating }] =
     expenseConceptApi.useCreateExpenseConceptMutation();
+  const [updateExpenseConcept, { isLoading: isUpdating }] =
+    expenseConceptApi.useUpdateExpenseConceptMutation();
+  const [getExpenseConcept, { isFetching }] =
+    expenseConceptApi.useLazyGetExpenseConceptQuery();
+  const isUpdate = !!actionModal.update && selectedItems.length === 1;
+
+  const handleGetExpenseConcept = async (id: string) => {
+    try {
+      const payload = await getExpenseConcept(id).unwrap();
+      formik.setValues({
+        name: payload.name,
+        detail: payload.detail,
+        unit_price: payload.unit_price,
+      });
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  useEffect(() => {
+    if (isUpdate) {
+      handleGetExpenseConcept(selectedItems[0]);
+    }
+  }, [actionModal, selectedItems]);
 
   const hanleConfirm = async () => {
     formik.handleSubmit();
@@ -46,25 +72,31 @@ export default function CreateOrUpdateExpenseConcepts({
     },
     onSubmit: async (data: CreateExpenseConceptReq) => {
       try {
-        const res = await createExpenseConcept(data).unwrap();
-        dispatch(setSnackbar({ message: MSG.successCreate(res.name) }));
+        if (isUpdate) {
+          const id = selectedItems[0];
+          const res = await updateExpenseConcept({ id, data }).unwrap();
+          dispatch(setSnackbar({ message: MSG.successUpdate(res.name) }));
+        } else {
+          const res = await createExpenseConcept(data).unwrap();
+          dispatch(setSnackbar({ message: MSG.successCreate(res.name) }));
+        }
         handleClose();
       } catch (err) {
-        // error handled by global error handler
+        throw err;
       }
     },
     validationSchema: Yup.object({
       name: Yup.string()
         .required(MSG.required)
-        .min(VLDN.NAME.min, MSG.minLength(VLDN.NAME.min))
-        .max(VLDN.NAME.max, MSG.maxLength(VLDN.NAME.max)),
+        .min(VLDN.SHORT_STRING.min, MSG.minLength(VLDN.SHORT_STRING.min))
+        .max(VLDN.SHORT_STRING.max, MSG.maxLength(VLDN.SHORT_STRING.max)),
       detail: Yup.string()
-        .min(VLDN.DETAIL.min, MSG.minLength(VLDN.DETAIL.min))
-        .max(VLDN.DETAIL.max, MSG.maxLength(VLDN.DETAIL.max)),
+        .min(VLDN.LONG_STRING.min, MSG.minLength(VLDN.LONG_STRING.min))
+        .max(VLDN.LONG_STRING.max, MSG.maxLength(VLDN.LONG_STRING.max)),
       unit_price: Yup.number()
         .required(MSG.required)
-        .min(VLDN.FLOAT_NUMBER.min, MSG.minLength(VLDN.FLOAT_NUMBER.min))
-        .max(VLDN.FLOAT_NUMBER.max, MSG.maxLength(VLDN.FLOAT_NUMBER.max)),
+        .min(VLDN.NN_REAL_NUMBER.min, MSG.minLength(VLDN.NN_REAL_NUMBER.min))
+        .max(VLDN.NN_REAL_NUMBER.max, MSG.maxLength(VLDN.NN_REAL_NUMBER.max)),
     }),
     validateOnChange: false,
     validateOnBlur: false,
@@ -77,8 +109,8 @@ export default function CreateOrUpdateExpenseConcepts({
       id: "name",
       value: formik.values.name,
       error: formik.errors.name,
-      max: VLDN.NAME.max,
-      min: VLDN.NAME.min,
+      max: VLDN.SHORT_STRING.max,
+      min: VLDN.SHORT_STRING.min,
     },
     {
       required: false,
@@ -86,8 +118,8 @@ export default function CreateOrUpdateExpenseConcepts({
       id: "detail",
       value: formik.values.detail,
       error: formik.errors.detail,
-      max: VLDN.DETAIL.max,
-      min: VLDN.DETAIL.min,
+      max: VLDN.LONG_STRING.max,
+      min: VLDN.LONG_STRING.min,
     },
     {
       required: true,
@@ -95,8 +127,8 @@ export default function CreateOrUpdateExpenseConcepts({
       id: "unit_price",
       value: formik.values.unit_price,
       error: formik.errors.unit_price,
-      max: VLDN.FLOAT_NUMBER.max,
-      min: VLDN.FLOAT_NUMBER.min,
+      max: VLDN.NN_REAL_NUMBER.max,
+      min: VLDN.NN_REAL_NUMBER.min,
       InputProps: {
         inputComponent: NumericFormatFloat as any,
         startAdornment: <InputAdornment position="start">$</InputAdornment>,
@@ -105,12 +137,13 @@ export default function CreateOrUpdateExpenseConcepts({
   ];
 
   return (
-    <CreateModal
+    <CreateOrUpdateModal
       open={open}
       label={label}
       hanleConfirm={hanleConfirm}
       handleClose={handleClose}
-      isCreating={isCreating}
+      loading={isFetching || isCreating || isUpdating}
+      isUpdate={isUpdate}
     >
       <Grid
         container
@@ -120,7 +153,7 @@ export default function CreateOrUpdateExpenseConcepts({
         spacing={2}
       >
         {inputs.map((input) => (
-          <Grid item>
+          <Grid item key={input.id}>
             <TextField
               required={input.required}
               label={input.label}
@@ -142,6 +175,6 @@ export default function CreateOrUpdateExpenseConcepts({
           </Grid>
         ))}
       </Grid>
-    </CreateModal>
+    </CreateOrUpdateModal>
   );
 }

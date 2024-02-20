@@ -269,18 +269,15 @@ export default function DataGrid({
     }
   };
 
-  const handleSelectItem = useCallback(
-    (itemId: string) => {
-      dispatch(setSelectedItems(itemId));
-    },
-    [dispatch]
-  );
+  const handleSelectItem = (itemId: string) => {
+    dispatch(setSelectedItems(itemId));
+  };
 
-  const handleSelectAll = useCallback(() => {
+  const handleSelectAll = () => {
     if (isAllSelected) return dispatch(resetSelectedItems());
     if (data?.items)
       return dispatch(setSelectedItems(data.items.map((item) => item.id)));
-  }, [isAllSelected, data, dispatch]);
+  };
 
   const debounceFetchItems = useCallback(
     debounce(async (filter: string) => {

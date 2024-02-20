@@ -8,26 +8,30 @@ import {
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
-interface CreateModalProps {
+interface CreateOrUpdateModalProps {
   open: boolean;
   label?: string;
   hanleConfirm: () => void;
   handleClose: () => void;
-  isCreating?: boolean;
+  loading?: boolean;
+  isUpdate?: boolean;
   children: React.ReactNode;
 }
 
-export default function CreateModal({
+export default function CreateOrUpdateModal({
   open,
   label = "Item",
   hanleConfirm,
   handleClose,
-  isCreating,
+  loading = false,
+  isUpdate = false,
   children,
-}: CreateModalProps) {
+}: CreateOrUpdateModalProps) {
   return (
     <Dialog open={open} onClose={handleClose} scroll="paper" maxWidth="md">
-      <DialogTitle>{`Crear nuevo ${label}`}</DialogTitle>
+      <DialogTitle>{`${
+        isUpdate ? "Actualizar" : "Crear nuevo"
+      } ${label}`}</DialogTitle>
       <DialogContent dividers sx={{ p: 3 }}>
         {children}
       </DialogContent>
@@ -36,13 +40,13 @@ export default function CreateModal({
           Cancelar
         </Button>
         <LoadingButton
-          loading={isCreating}
+          loading={loading}
           onClick={hanleConfirm}
           type="submit"
           autoFocus
           variant="contained"
         >
-          Crear
+          {isUpdate ? "Actualizar" : "Crear"}
         </LoadingButton>
       </DialogActions>
     </Dialog>

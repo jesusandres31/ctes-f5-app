@@ -1,12 +1,12 @@
-import { GetExpenseConceptRes } from "src/interfaces";
+import { ExpenseConcept } from "src/interfaces";
 import { Entity, IColumn } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
 import { expenseConceptApi } from "src/app/services/expenseConceptService";
 import { useUISelector } from "src/slices/ui/uiSlice";
-import CreateOrUpdateExpenseConcepts from "./content/CreateOrUpdateExpenseConcepts";
+import CreateOrUpdateExpenseConcept from "./content/CreateOrUpdateExpenseConcept";
 import DeleteExpenseConcepts from "./content/DeleteExpenseConcepts";
 
-const COLUMNS: IColumn<GetExpenseConceptRes>[] = [
+const COLUMNS: IColumn<ExpenseConcept>[] = [
   {
     minWidth: 150,
     label: "Nombre",
@@ -28,7 +28,7 @@ const COLUMNS: IColumn<GetExpenseConceptRes>[] = [
   },
 ];
 
-const DEFAULT_ORDER_BY: keyof GetExpenseConceptRes = "name";
+const DEFAULT_ORDER_BY: keyof ExpenseConcept = "name";
 
 const ENTITY: Entity = "expense_concepts";
 
@@ -57,7 +57,10 @@ export default function ExpenseConcepts() {
         entity={ENTITY}
       />
       <DeleteExpenseConcepts open={MODAL.delete} label={MODAL.label} />
-      <CreateOrUpdateExpenseConcepts open={MODAL.create} label={MODAL.label} />
+      <CreateOrUpdateExpenseConcept
+        open={MODAL.create || MODAL.update}
+        label={MODAL.label}
+      />
     </>
   );
 }

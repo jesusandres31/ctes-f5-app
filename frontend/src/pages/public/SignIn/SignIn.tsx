@@ -30,21 +30,19 @@ export default function SignIn() {
       email: Yup.string()
         .email(MSG.invalidEmail)
         .required(MSG.required)
-        .min(VLDN.EMAIL.min, MSG.minLength(VLDN.EMAIL.min))
-        .max(VLDN.EMAIL.max, MSG.maxLength(VLDN.EMAIL.max)),
+        .min(VLDN.SHORT_STRING.min, MSG.minLength(VLDN.SHORT_STRING.min))
+        .max(VLDN.SHORT_STRING.max, MSG.maxLength(VLDN.SHORT_STRING.max)),
       password: Yup.string()
         .required(MSG.required)
-        .min(VLDN.PSSWD.min, MSG.minLength(VLDN.PSSWD.min))
-        .max(VLDN.PSSWD.max, MSG.maxLength(VLDN.PSSWD.max)),
+        .min(VLDN.SHORT_STRING.min, MSG.minLength(VLDN.SHORT_STRING.min))
+        .max(VLDN.SHORT_STRING.max, MSG.maxLength(VLDN.SHORT_STRING.max)),
     }),
     onSubmit: async (data: SignInReq) => {
       try {
         handleSignIn(data);
-        // dispatch(setSnackbar({ message: "Login success" }));
         formik.setValues(formik.initialValues);
         handleResetError();
       } catch (err: any) {
-        console.log(err);
         dispatch(setSnackbar({ message: err.data.error, type: "error" }));
       }
     },
@@ -98,8 +96,8 @@ export default function SignIn() {
             helperText={formik.errors.email ? formik.errors.email : " "}
             variant="outlined"
             inputProps={{
-              max: VLDN.EMAIL.max,
-              min: VLDN.EMAIL.min,
+              max: VLDN.SHORT_STRING.max,
+              min: VLDN.SHORT_STRING.min,
             }}
           />
           <TextField
@@ -120,8 +118,8 @@ export default function SignIn() {
             helperText={formik.errors.password ? formik.errors.password : " "}
             variant="outlined"
             inputProps={{
-              max: VLDN.PSSWD.max,
-              min: VLDN.PSSWD.min,
+              max: VLDN.SHORT_STRING.max,
+              min: VLDN.SHORT_STRING.min,
             }}
           />
           <LoadingButton

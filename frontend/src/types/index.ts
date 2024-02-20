@@ -1,4 +1,4 @@
-import { GetExpenseConceptRes, GetExpenseRes } from "src/interfaces";
+import { ExpenseConcept, Expense } from "src/interfaces";
 
 export interface IColumn<T> {
   id: keyof T;
@@ -11,7 +11,7 @@ export interface IColumn<T> {
 export type Order = "asc" | "desc";
 
 // all the app entities goes here
-export type Item = GetExpenseRes | GetExpenseConceptRes;
+export type Item = Expense | ExpenseConcept;
 
 // modal configuration
 export type Entity = "expenses" | "expense_concepts";
@@ -19,7 +19,7 @@ export type Action = "create" | "update" | "delete";
 
 // we have to create this Type due to this error message:
 // "The expected type comes from property 'columns' which is declared here on type 'IntrinsicAttributes & DataGridProps'."
-export type Column = IColumn<GetExpenseRes>[] | IColumn<GetExpenseConceptRes>[];
+export type Column = IColumn<Expense>[] | IColumn<ExpenseConcept>[];
 
 export interface IMenuItem {
   text: string;
@@ -62,6 +62,6 @@ export interface Input {
   min?: number;
   InputProps?: {
     inputComponent: React.ComponentType<any>;
-    startAdornment: JSX.Element;
+    startAdornment?: JSX.Element;
   };
 }

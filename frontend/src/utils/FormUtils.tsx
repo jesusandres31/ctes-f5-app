@@ -62,11 +62,10 @@ export const handleSetNumber = (
  * validations
  */
 export const VLDN = {
-  NAME: { min: 3, max: 60 },
-  DETAIL: { min: 3, max: 100 },
-  EMAIL: { min: 5, max: 60 },
-  PSSWD: { min: 4, max: 50 },
-  FLOAT_NUMBER: { min: 0, max: 1000000 },
+  SHORT_STRING: { min: 3, max: 60 },
+  LONG_STRING: { min: 3, max: 100 },
+  NN_REAL_NUMBER: { min: 0, max: 1000000 },
+  REAL_NUMBER: { min: -1000000, max: 1000000 },
 };
 
 /**
@@ -82,4 +81,6 @@ export const MSG = {
   successDelete: (length: number) =>
     `Item${isFew(length)} eliminado${isFew(length)} satisfactoriamente.`,
   successCreate: (name: string) => `Item ${name} creado satisfactoriamente.`,
+  successUpdate: (name: string) =>
+    `Item ${name} actualizado satisfactoriamente.`,
 };

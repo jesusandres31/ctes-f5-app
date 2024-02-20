@@ -1,4 +1,4 @@
-import { GetExpenseRes } from "src/interfaces";
+import { CreateExpenseReq, Expense, UpdateExpenseReq } from "src/interfaces";
 import { ApiTag, getPbOrder, mainApi } from "./api";
 import { pb } from "src/libs";
 import { ListResult } from "pocketbase";
@@ -16,13 +16,15 @@ enum Field {
   total = "total",
 }
 
+const TAG = ApiTag.Expenses;
+
 export const expenseApi = mainApi.injectEndpoints({
   endpoints: (build) => ({
-    getExpenses: build.query<ListResult<GetExpenseRes>, GetList>({
+    getExpenses: build.query<ListResult<Expense>, GetList>({
       queryFn: async (_arg, _api, _options) => {
         const res = await pb
-          .collection(ApiTag.Expenses)
-          .getList<GetExpenseRes>(_arg.page, _arg.perPage, {
+          .collection(TAG)
+          .getList<Expense>(_arg.page, _arg.perPage, {
             expand: FK.expense_concept,
             sort:
               _arg.order && _arg.orderBy
@@ -40,19 +42,44 @@ export const expenseApi = mainApi.injectEndpoints({
           });
         return { data: res };
       },
-      providesTags: [ApiTag.Expenses],
+      providesTags: [TAG],
+    }),
+    getExpense: build.query<Expense, string>({
+      queryFn: async (_arg, _api, _options) => {
+        const res = await pb
+          .collection(TAG)
+          .getOne<Expense>(_arg, { expand: FK.expense_concept });
+        return { data: res };
+      },
+      providesTags: [TAG],
+    }),
+    createExpense: build.mutation<Expense, CreateExpenseReq>({
+      queryFn: async (_arg, _api, _options) => {
+        const res = await pb.collection(TAG).create<Expense>(_arg);
+        return { data: res };
+      },
+      invalidatesTags: [TAG],
+    }),
+    updateExpense: build.mutation<Expense, UpdateExpenseReq>({
+      queryFn: async (_arg, _api, _options) => {
+        const res = await pb
+          .collection(TAG)
+          .update<Expense>(_arg.id, _arg.data);
+        return { data: res };
+      },
+      invalidatesTags: [TAG],
     }),
     deleteExpense: build.mutation<PromiseSettledResult<void>[], string[]>({
       queryFn: async (_arg, _api, _options) => {
         const items = Array.isArray(_arg) ? _arg : [_arg];
         const res = await Promise.allSettled(
           items.map(async (id) => {
-            await pb.collection(ApiTag.Expenses).delete(id);
+            await pb.collection(TAG).delete(id);
           })
         );
         return { data: res };
       },
-      invalidatesTags: [ApiTag.Expenses],
+      invalidatesTags: [TAG],
     }),
   }),
 });

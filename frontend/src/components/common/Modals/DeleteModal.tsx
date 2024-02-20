@@ -36,7 +36,7 @@ export default function DeleteModal({
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>{`Eliminar nuevo ${label}`}</DialogTitle>
+      <DialogTitle>{`Eliminar ${label}`}</DialogTitle>
       <DialogContent>
         <DialogContentText>
           {`Si eliminas ${few ? "los siguientes" : "el siguiente"} 

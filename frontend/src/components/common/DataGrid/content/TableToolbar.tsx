@@ -143,7 +143,9 @@ export default function TableToolbar({
                     <CustomIconButton
                       text="Update"
                       icon={<CreateRounded />}
-                      onClick={() => {}}
+                      onClick={() =>
+                        dispatch(openModal({ entity, action: "update" }))
+                      }
                       isMobile={isMobile}
                     />
                   )}

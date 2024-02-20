@@ -41,7 +41,7 @@ export const formatNulls = (value: any) => {
 export const isValidNumber = (value: number | undefined): boolean => {
   return (
     value !== undefined &&
-    value < VLDN.FLOAT_NUMBER.max &&
-    value > VLDN.FLOAT_NUMBER.min
+    value < VLDN.NN_REAL_NUMBER.max &&
+    value > VLDN.NN_REAL_NUMBER.min
   );
 };
