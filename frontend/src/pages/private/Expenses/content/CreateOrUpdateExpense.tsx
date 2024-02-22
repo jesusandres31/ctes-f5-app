@@ -1,17 +1,16 @@
-import { Grid, InputAdornment, TextField } from "@mui/material";
+import { InputAdornment } from "@mui/material";
 import { useFormik } from "formik";
-import { CreateExpenseReq } from "src/interfaces";
+import { CreateExpenseReq, ExpenseConcept } from "src/interfaces";
 import * as Yup from "yup";
-import { STYLE } from "src/constants";
 import CreateOrUpdateModal from "src/components/common/Modals/CreateOrUpdateModal";
-import {
-  MSG,
-  VLDN,
-  NumericFormatFloat,
-  handleSetText,
-} from "src/utils/FormUtils";
+import { MSG, VLDN, NumericFormatFloat } from "src/utils/FormUtils";
 import { useAppDispatch } from "src/app/store";
-import { closeModal, setSnackbar, useUISelector } from "src/slices/ui/uiSlice";
+import {
+  closeModal,
+  setSnackbar,
+  uiInitialState,
+  useUISelector,
+} from "src/slices/ui/uiSlice";
 import { expenseApi } from "src/app/services/expenseService";
 import { Input } from "src/types";
 import { useEffect } from "react";
@@ -32,11 +31,12 @@ export default function CreateOrUpdateExpense({
     expenseApi.useCreateExpenseMutation();
   const [updateExpense, { isLoading: isUpdating }] =
     expenseApi.useUpdateExpenseMutation();
-  const [getExpense, { isFetching }] = expenseApi.useLazyGetExpenseQuery();
   const [
     getExpenseConcepts,
-    { data: expenseConcepts, isFetching: isFetchinExpCep, error },
+    { data: expenseConcepts, isFetching: isFetchinExpCep },
   ] = expenseConceptApi.useLazyGetExpenseConceptsQuery();
+  const [getExpense, { data: expense, isFetching }] =
+    expenseApi.useLazyGetExpenseQuery();
   const isUpdate = !!actionModal.update && selectedItems.length === 1;
 
   const handleGetExpense = async (id: string) => {
@@ -56,11 +56,21 @@ export default function CreateOrUpdateExpense({
 
   const handleGetExpenseConcepts = async () => {
     try {
-      await getExpenseConcepts({}).unwrap();
+      await getExpenseConcepts({
+        page: uiInitialState.page,
+        perPage: uiInitialState.perPage,
+        filter: uiInitialState.filter,
+        order: uiInitialState.order,
+        orderBy: uiInitialState.orderBy,
+      }).unwrap();
     } catch (err) {
       throw err;
     }
   };
+
+  useEffect(() => {
+    handleGetExpenseConcepts();
+  }, []);
 
   useEffect(() => {
     if (isUpdate) {
@@ -90,24 +100,24 @@ export default function CreateOrUpdateExpense({
       try {
         if (isUpdate) {
           const id = selectedItems[0];
-          const res = await updateExpense({ id, data }).unwrap();
+          await updateExpense({ id, data }).unwrap();
           dispatch(
             setSnackbar({
-              message: MSG.successUpdate(res.expand.expense_concept.id),
+              message: MSG.successUpdate(""),
             })
           );
         } else {
-          const res = await createExpense(data).unwrap();
+          await createExpense(data).unwrap();
           dispatch(
             setSnackbar({
-              message: MSG.successCreate(res.expand.expense_concept.id),
+              message: MSG.successCreate(""),
             })
           );
         }
-        handleClose();
       } catch (err) {
         throw err;
       }
+      handleClose();
     },
     validationSchema: Yup.object({
       expense_concept: Yup.string()
@@ -134,15 +144,21 @@ export default function CreateOrUpdateExpense({
     validateOnBlur: false,
   });
 
-  const inputs: Input[] = [
+  const inputs: Input<ExpenseConcept>[] = [
     {
       required: true,
       label: "Concepto",
-      id: "concept",
+      id: "expense_concept",
       value: formik.values.expense_concept,
       error: formik.errors.expense_concept,
       max: VLDN.SHORT_STRING.max,
       min: VLDN.SHORT_STRING.min,
+      options: expenseConcepts ? expenseConcepts.items : [],
+      fetchItemsFunc: getExpenseConcepts,
+      loading: isFetchinExpCep,
+      getOptionLabel: (option) => option.name,
+      startValue:
+        isUpdate && expense ? expense.expand.expense_concept : undefined,
     },
     {
       required: false,
@@ -201,37 +217,8 @@ export default function CreateOrUpdateExpense({
       handleClose={handleClose}
       loading={isFetching || isCreating || isUpdating}
       isUpdate={isUpdate}
-    >
-      <Grid
-        container
-        direction="column"
-        justifyContent="center"
-        alignItems="center"
-        spacing={2}
-      >
-        {inputs.map((input) => (
-          <Grid item key={input.id}>
-            <TextField
-              required={input.required}
-              label={input.label}
-              id={input.id}
-              name={input.id}
-              value={input.value}
-              onChange={(e) => handleSetText(e, formik, input.id)}
-              autoComplete="off"
-              error={!!input.error}
-              helperText={input.error ? input.error : " "}
-              variant="outlined"
-              inputProps={{
-                max: input.max,
-                min: input.min,
-              }}
-              InputProps={input.InputProps}
-              sx={{ width: STYLE.width.textfield }}
-            />
-          </Grid>
-        ))}
-      </Grid>
-    </CreateOrUpdateModal>
+      inputs={inputs}
+      formik={formik}
+    />
   );
 }

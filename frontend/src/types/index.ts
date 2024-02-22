@@ -1,3 +1,11 @@
+import { FetchArgs, FetchBaseQueryMeta } from "@reduxjs/toolkit/query";
+import {
+  BaseQueryFn,
+  FetchBaseQueryError,
+  QueryActionCreatorResult,
+  QueryDefinition,
+} from "@reduxjs/toolkit/query";
+import { ListResult } from "pocketbase";
 import { ExpenseConcept, Expense } from "src/interfaces";
 
 export interface IColumn<T> {
@@ -52,7 +60,7 @@ export enum PromiseStatus {
 /**
  * form
  */
-export interface Input {
+export interface Input<T> {
   required: boolean;
   label: string;
   id: string;
@@ -64,4 +72,28 @@ export interface Input {
     inputComponent: React.ComponentType<any>;
     startAdornment?: JSX.Element;
   };
+  options?: T[];
+  fetchItemsFunc?: FetchItemsFunc;
+  loading?: boolean;
+  getOptionLabel?: (option: T) => string;
+  startValue?: T;
 }
+
+export type FetchItemsFunc = (
+  arg: GetList,
+  preferCacheValue?: boolean | undefined
+) => QueryActionCreatorResult<
+  QueryDefinition<
+    GetList,
+    BaseQueryFn<
+      string | FetchArgs,
+      unknown,
+      FetchBaseQueryError,
+      {},
+      FetchBaseQueryMeta
+    >,
+    string,
+    ListResult<any>,
+    "api"
+  >
+>;

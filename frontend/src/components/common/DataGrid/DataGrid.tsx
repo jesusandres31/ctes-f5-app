@@ -15,16 +15,17 @@ import {
   debounce,
   TableSortLabel,
 } from "@mui/material";
-import { Column, Entity, GetList, IColumn, Item, Order } from "src/types";
+import {
+  Column,
+  Entity,
+  FetchItemsFunc,
+  IColumn,
+  Item,
+  Order,
+} from "src/types";
 import { formatNulls } from "src/utils";
 import { Loading, ErrorMsg } from "src/components/common";
-import {
-  BaseQueryFn,
-  FetchArgs,
-  FetchBaseQueryError,
-  FetchBaseQueryMeta,
-  QueryActionCreatorResult,
-} from "@reduxjs/toolkit/query";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { SerializedError } from "@reduxjs/toolkit";
 import PageContainer from "../PageContainer/PageContainer";
 import NoItems from "../NoItems";
@@ -43,7 +44,6 @@ import {
   useUISelector,
 } from "src/slices/ui/uiSlice";
 import { useAppDispatch } from "src/app/store";
-import { QueryDefinition } from "@reduxjs/toolkit/query";
 import { ListResult } from "pocketbase";
 import TableToolbar from "./content/TableToolbar";
 import { CustomGrid } from "./content/utils";
@@ -190,24 +190,7 @@ interface DataGridProps {
   columns: Column;
   entity: Entity;
   defaultOrderBy: string;
-  fetchItemsFunc: (
-    arg: GetList,
-    preferCacheValue?: boolean | undefined
-  ) => QueryActionCreatorResult<
-    QueryDefinition<
-      GetList,
-      BaseQueryFn<
-        string | FetchArgs,
-        unknown,
-        FetchBaseQueryError,
-        {},
-        FetchBaseQueryMeta
-      >,
-      string,
-      ListResult<any>,
-      "api"
-    >
-  >;
+  fetchItemsFunc: FetchItemsFunc;
 }
 
 export default function DataGrid({

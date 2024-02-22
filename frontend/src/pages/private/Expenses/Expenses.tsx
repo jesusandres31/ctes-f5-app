@@ -2,7 +2,7 @@ import { Expense } from "src/interfaces";
 import { Entity, IColumn } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
 import { expenseApi } from "src/app/services/expenseService";
-import { formatDate } from "src/utils";
+import { formatDate, formatMoney } from "src/utils";
 import { useUISelector } from "src/slices/ui/uiSlice";
 import DeleteExpenses from "./content/DeleteExpenses";
 import CreateOrUpdateExpense from "./content/CreateOrUpdateExpense";
@@ -32,14 +32,14 @@ const COLUMNS: IColumn<Expense>[] = [
     label: "Precio Unit.",
     id: "unit_price",
     align: "right",
-    render: (item) => `$ ${item.unit_price}`,
+    render: (item) => formatMoney(item.unit_price),
   },
   {
     minWidth: 100,
     label: "Total",
     id: "total",
     align: "right",
-    render: (item) => `$ ${item.total}`,
+    render: (item) => formatMoney(item.total),
   },
   {
     minWidth: 100,

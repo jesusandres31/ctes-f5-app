@@ -36,7 +36,7 @@ interface IUIState {
   actionModal: IActionModal;
 }
 
-const initialState: IUIState = {
+export const uiInitialState: IUIState = {
   openDrawer: false,
   collapse: null,
   navbar: null,
@@ -68,7 +68,7 @@ export const isSelected = (selectedItems: string[], itemId: string) => {
 
 const ui = createSlice({
   name: "ui",
-  initialState,
+  initialState: uiInitialState,
   reducers: {
     toggleOpenDrawer(state: IUIState) {
       state.openDrawer = !state.openDrawer;
@@ -81,7 +81,7 @@ const ui = createSlice({
     },
     setSnackbar(state: IUIState, { payload }: PayloadAction<ISnackbar>) {
       state.snackbar.message = payload.message;
-      state.snackbar.type = payload.type ?? initialState.snackbar.type;
+      state.snackbar.type = payload.type ?? uiInitialState.snackbar.type;
       state.snackbar.open = payload.open ?? true;
     },
     resetSnackbar(state: IUIState) {
@@ -116,13 +116,13 @@ const ui = createSlice({
       state.page = payload;
     },
     resetSelectedItems(state: IUIState) {
-      state.selectedItems = initialState.selectedItems;
+      state.selectedItems = uiInitialState.selectedItems;
     },
     resetFilter(state: IUIState) {
-      state.filter = initialState.filter;
+      state.filter = uiInitialState.filter;
     },
     resetPage(state: IUIState) {
-      state.page = initialState.page;
+      state.page = uiInitialState.page;
     },
     openModal(
       state: IUIState,
@@ -139,7 +139,7 @@ const ui = createSlice({
       }
     },
     closeModal(state: IUIState) {
-      state.actionModal = initialState.actionModal;
+      state.actionModal = uiInitialState.actionModal;
     },
   },
 });

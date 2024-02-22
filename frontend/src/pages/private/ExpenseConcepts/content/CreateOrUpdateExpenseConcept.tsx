@@ -1,15 +1,9 @@
-import { Grid, InputAdornment, TextField } from "@mui/material";
+import { InputAdornment } from "@mui/material";
 import { useFormik } from "formik";
-import { CreateExpenseConceptReq } from "src/interfaces";
+import { CreateExpenseConceptReq, Expense } from "src/interfaces";
 import * as Yup from "yup";
-import { STYLE } from "src/constants";
 import CreateOrUpdateModal from "src/components/common/Modals/CreateOrUpdateModal";
-import {
-  MSG,
-  VLDN,
-  NumericFormatFloat,
-  handleSetText,
-} from "src/utils/FormUtils";
+import { MSG, VLDN, NumericFormatFloat } from "src/utils/FormUtils";
 import { useAppDispatch } from "src/app/store";
 import { closeModal, setSnackbar, useUISelector } from "src/slices/ui/uiSlice";
 import { expenseConceptApi } from "src/app/services/expenseConceptService";
@@ -102,7 +96,7 @@ export default function CreateOrUpdateExpenseConcept({
     validateOnBlur: false,
   });
 
-  const inputs: Input[] = [
+  const inputs: Input<Expense>[] = [
     {
       required: true,
       label: "Nombre",
@@ -144,37 +138,8 @@ export default function CreateOrUpdateExpenseConcept({
       handleClose={handleClose}
       loading={isFetching || isCreating || isUpdating}
       isUpdate={isUpdate}
-    >
-      <Grid
-        container
-        direction="column"
-        justifyContent="center"
-        alignItems="center"
-        spacing={2}
-      >
-        {inputs.map((input) => (
-          <Grid item key={input.id}>
-            <TextField
-              required={input.required}
-              label={input.label}
-              id={input.id}
-              name={input.id}
-              value={input.value}
-              onChange={(e) => handleSetText(e, formik, input.id)}
-              autoComplete="off"
-              error={!!input.error}
-              helperText={input.error ? input.error : " "}
-              variant="outlined"
-              inputProps={{
-                max: input.max,
-                min: input.min,
-              }}
-              InputProps={input.InputProps}
-              sx={{ width: STYLE.width.textfield }}
-            />
-          </Grid>
-        ))}
-      </Grid>
-    </CreateOrUpdateModal>
+      inputs={inputs}
+      formik={formik}
+    />
   );
 }

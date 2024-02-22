@@ -2,7 +2,7 @@ import React from "react";
 import { isValidNumber } from "src/utils";
 import { NumericFormat, NumericFormatProps } from "react-number-format";
 import { capitalize } from "@mui/material";
-import { FormikValues } from "formik";
+import { FormikProps } from "formik";
 import { removeExtraSpace } from "src/utils";
 
 interface CustomProps {
@@ -40,21 +40,12 @@ export const NumericFormatFloat = React.forwardRef<
   );
 });
 
-export const handleSetText = (
+export const handleSetFormikValue = (
   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  formik: FormikValues,
+  formik: FormikProps<any>,
   prop: string
 ) => {
   formik.setFieldValue(prop, removeExtraSpace(capitalize(e.target.value)));
-  formik.setErrors({});
-};
-
-export const handleSetNumber = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  formik: FormikValues,
-  prop: string
-) => {
-  formik.setFieldValue(prop, e.target.value);
   formik.setErrors({});
 };
 

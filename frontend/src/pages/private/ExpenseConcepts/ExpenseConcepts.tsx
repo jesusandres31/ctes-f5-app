@@ -5,6 +5,7 @@ import { expenseConceptApi } from "src/app/services/expenseConceptService";
 import { useUISelector } from "src/slices/ui/uiSlice";
 import CreateOrUpdateExpenseConcept from "./content/CreateOrUpdateExpenseConcept";
 import DeleteExpenseConcepts from "./content/DeleteExpenseConcepts";
+import { formatDate, formatMoney } from "src/utils";
 
 const COLUMNS: IColumn<ExpenseConcept>[] = [
   {
@@ -24,11 +25,18 @@ const COLUMNS: IColumn<ExpenseConcept>[] = [
     label: "Precio Unit.",
     id: "unit_price",
     align: "right",
-    render: (item) => `$ ${item.unit_price}`,
+    render: (item) => formatMoney(item.unit_price),
+  },
+  {
+    minWidth: 100,
+    label: "Fecha Creación",
+    id: "created",
+    align: "right",
+    render: (item) => formatDate(item.created),
   },
 ];
 
-const DEFAULT_ORDER_BY: keyof ExpenseConcept = "name";
+const DEFAULT_ORDER_BY: keyof ExpenseConcept = "created";
 
 const ENTITY: Entity = "expense_concepts";
 

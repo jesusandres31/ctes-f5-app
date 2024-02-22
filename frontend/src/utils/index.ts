@@ -21,9 +21,11 @@ export const removeSpace = (str: string) => {
 
 export const removeExtraSpace = (str: string) => {
   if (str.length === 1) {
-    str = str.replace(/\s/g, ""); // not allow two consecutive spaces
+    // not allow two consecutive spaces
+    str = str.replace(/\s/g, "");
   } else {
-    str = str.replace(/ +(?= )/g, ""); // not allow spaces at beginnign
+    // not allow spaces at beginnign
+    str = str.replace(/ +(?= )/g, "");
   }
   return str;
 };
@@ -33,6 +35,17 @@ export const formatNulls = (value: any) => {
     value = "-";
   }
   return value;
+};
+
+export const formatMoney = (num: number) => {
+  if (isNaN(num)) {
+    return "NaN";
+  }
+  const formattedPrice = num.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+  return formattedPrice;
 };
 
 /**
