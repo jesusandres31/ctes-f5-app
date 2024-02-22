@@ -1,5 +1,4 @@
 import { AppRoutes } from "src/config";
-import { uiInitialState } from "src/slices/ui/uiSlice";
 
 /**
  * style
