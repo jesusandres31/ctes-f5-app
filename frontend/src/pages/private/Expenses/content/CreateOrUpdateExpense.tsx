@@ -166,6 +166,7 @@ export default function CreateOrUpdateExpense({
       id: "detail",
       value: formik.values.detail,
       error: formik.errors.detail,
+      multiline: true,
       max: VLDN.LONG_STRING.max,
       min: VLDN.LONG_STRING.min,
     },

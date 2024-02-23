@@ -68,6 +68,7 @@ export interface Input<T> {
   error: string | undefined;
   max?: number;
   min?: number;
+  multiline?: boolean;
   InputProps?: {
     inputComponent: React.ComponentType<any>;
     startAdornment?: JSX.Element;
