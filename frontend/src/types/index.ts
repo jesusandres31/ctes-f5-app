@@ -31,9 +31,10 @@ export type Column = IColumn<Expense>[] | IColumn<ExpenseConcept>[];
 
 export interface IMenuItem {
   text: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   to: string;
   onClick?: () => void;
+  nestedItems?: IMenuItem[];
 }
 
 export interface DrawerSection {

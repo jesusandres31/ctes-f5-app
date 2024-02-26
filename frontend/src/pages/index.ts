@@ -3,3 +3,7 @@ export { default as ExpenseConcepts } from "./private/ExpenseConcepts/ExpenseCon
 export { default as NotFound } from "./public/NotFound/NotFound";
 export { default as Unauthorized } from "./public/Unauthorized/Unauthorized";
 export { default as SignIn } from "./public/SignIn/SignIn";
+export { default as Clients } from "./private/Clients/Clients";
+export { default as Sales } from "./private/Sales/Sales";
+export { default as Products } from "./private/Products/Products";
+export { default as Rentals } from "./private/Rentals/Rentals";

@@ -18,11 +18,18 @@ import {
   darken,
   ListSubheader,
   Grid,
+  Collapse,
 } from "@mui/material";
 import {
   MenuRounded,
-  PresentToAllRounded,
   FileUploadRounded,
+  SportsSoccerRounded,
+  StorefrontRounded,
+  ShoppingCartRounded,
+  PeopleRounded,
+  PresentToAllRounded,
+  ExpandLess,
+  ExpandMore,
 } from "@mui/icons-material";
 import { AppRoutes, version } from "src/config";
 import { useRouter } from "src/hooks/useRouter";
@@ -35,17 +42,39 @@ const DRAWER_WIDTH = 230;
 
 const DRAWER_SECTIONS: DrawerSection[] = [
   {
-    title: "Egresos",
+    title: "Menu",
     menuItems: [
+      {
+        text: "Alquileres",
+        icon: <SportsSoccerRounded />,
+        to: AppRoutes.Rentals,
+      },
+      {
+        text: "Ventas",
+        icon: <StorefrontRounded />,
+        to: AppRoutes.Sales,
+      },
+      {
+        text: "Productos",
+        icon: <ShoppingCartRounded />,
+        to: AppRoutes.Products,
+      },
+      {
+        text: "Clientes",
+        icon: <PeopleRounded />,
+        to: AppRoutes.Clients,
+      },
       {
         text: "Egresos",
         icon: <FileUploadRounded />,
         to: AppRoutes.Expenses,
-      },
-      {
-        text: "Concept. Egresos",
-        icon: <PresentToAllRounded />,
-        to: AppRoutes.ExpenseConcepts,
+        nestedItems: [
+          {
+            text: "Concept. Egresos",
+            icon: <PresentToAllRounded />,
+            to: AppRoutes.ExpenseConcepts,
+          },
+        ],
       },
     ],
   },
@@ -53,10 +82,11 @@ const DRAWER_SECTIONS: DrawerSection[] = [
 
 interface CustomListProps {
   items: IMenuItem[];
-  subheader: string;
+  subheader?: string;
+  isNested?: boolean;
 }
 
-const CustomList = ({ items, subheader }: CustomListProps) => {
+const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
   const { handleGoTo, getRoute } = useRouter();
   const theme = useTheme();
   const isSelected = (path: string) => getRoute() === path;
@@ -65,77 +95,118 @@ const CustomList = ({ items, subheader }: CustomListProps) => {
 
   return (
     <List
+      component="div"
       subheader={
         <ListSubheader>
-          <Box py={1.5}>
-            <Typography variant="subtitle2">{subheader}</Typography>
-          </Box>
+          {subheader && (
+            <Box py={1.5}>
+              <Typography variant="subtitle2">{subheader}</Typography>
+            </Box>
+          )}
         </ListSubheader>
       }
     >
-      {items.map((item) => (
-        <ListItem
-          key={item.text}
-          disablePadding
-          selected={isSelected(item.to)}
-          sx={{
-            height: "45px",
-            "&.Mui-selected": {
-              // color: theme.palette.primary.main,
-              backgroundColor /* : lighten(theme.palette.primary.light, 0.7) */,
-              borderRadius,
-            },
-            "&:hover": {
-              backgroundColor,
-              borderRadius,
-            },
-            "&.Mui-selected:hover": {
-              backgroundColor /* : lighten(theme.palette.primary.light, 0.7) */,
-              borderRadius,
-            },
-            /* border: isSelected(item.to)
+      {items.map((item) => {
+        const [open, setOpen] = useState(false);
+
+        const handleClick = (
+          e: React.MouseEvent<HTMLDivElement, MouseEvent>
+        ) => {
+          setOpen(!open);
+          e.stopPropagation();
+        };
+
+        return (
+          <>
+            <ListItem
+              key={item.text}
+              disablePadding
+              selected={isSelected(item.to)}
+              sx={{
+                pl: isNested ? 1.5 : 0,
+                height: "45px",
+                "&.Mui-selected": {
+                  // color: theme.palette.primary.main,
+                  backgroundColor /* : lighten(theme.palette.primary.light, 0.7) */,
+                  borderRadius,
+                },
+                "&:hover": {
+                  backgroundColor,
+                  borderRadius,
+                },
+                "&.Mui-selected:hover": {
+                  backgroundColor /* : lighten(theme.palette.primary.light, 0.7) */,
+                  borderRadius,
+                },
+                /* border: isSelected(item.to)
               ? `1px solid ${lighten(theme.palette.primary.light, 0.7)}`
               : "none", */
-          }}
-        >
-          <ListItemButton
-            onClick={() => handleGoTo(item.to)}
-            sx={{
-              "&:hover": {
-                backgroundColor: "transparent",
-              },
-            }}
-          >
-            <Box pl={1} display="flex">
-              <ListItemIcon
+              }}
+            >
+              <ListItemButton
+                onClick={() => {
+                  handleGoTo(item.to);
+                }}
                 sx={{
-                  minWidth: "40px",
-                  // color: isSelected(item.to)
-                  //   ? theme.palette.primary.main
-                  //   : lighten(theme.palette.text.secondary, 0.2),
-                  color: theme.palette.primary.main,
+                  "&:hover": {
+                    backgroundColor: "transparent",
+                  },
                 }}
               >
-                {item.icon}
-              </ListItemIcon>
-            </Box>
-            <ListItemText
-              primary={
-                <Typography
-                  variant="subtitle2"
-                  color={
-                    isSelected(item.to)
-                      ? theme.palette.primary.main
-                      : "text.secondary"
+                {item.icon && (
+                  <Box pl={1} display="flex">
+                    <ListItemIcon
+                      sx={{
+                        minWidth: "40px",
+                        // color: isSelected(item.to)
+                        //   ? theme.palette.primary.main
+                        //   : lighten(theme.palette.text.secondary, 0.2),
+                        color: theme.palette.primary.main,
+                      }}
+                    >
+                      {item.icon}
+                    </ListItemIcon>
+                  </Box>
+                )}
+
+                <ListItemText
+                  primary={
+                    <Typography
+                      sx={{ fontSize: isNested ? 13 : 15 }}
+                      variant="subtitle2"
+                      color={
+                        isSelected(item.to)
+                          ? theme.palette.primary.main
+                          : "text.secondary"
+                      }
+                    >
+                      {item.text}
+                    </Typography>
                   }
-                >
-                  {item.text}
-                </Typography>
-              }
-            />
-          </ListItemButton>
-        </ListItem>
-      ))}
+                />
+                {item.nestedItems && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      color: theme.palette.text.disabled,
+                      padding: 5,
+                    }}
+                    onClick={(e) => handleClick(e)}
+                  >
+                    {open ? <ExpandLess /> : <ExpandMore />}
+                  </div>
+                )}
+              </ListItemButton>
+            </ListItem>
+            {item.nestedItems && (
+              <Collapse in={open} timeout="auto" unmountOnExit>
+                <CustomList items={item.nestedItems} isNested={true} />
+              </Collapse>
+            )}
+          </>
+        );
+      })}
     </List>
   );
 };

@@ -21,6 +21,10 @@ export enum AppRoutes {
   Unauthorized = "/unauthorized",
   Expenses = "/expenses",
   ExpenseConcepts = "/expense-concepts",
+  Clients = "/clients",
+  Rentals = "/rentals",
+  Sales = "/sales",
+  Products = "/products",
 }
 
 // general config

@@ -26,6 +26,14 @@ export const translateTitle = (title: string) => {
       return "Egresos";
     case AppRoutes.ExpenseConcepts:
       return "Conceptos de Egresos";
+    case AppRoutes.Clients:
+      return "Clientes";
+    case AppRoutes.Rentals:
+      return "Alquileres";
+    case AppRoutes.Sales:
+      return "Ventas";
+    case AppRoutes.Products:
+      return "Productos";
     default:
       return title;
   }
