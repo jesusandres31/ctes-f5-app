@@ -14,6 +14,7 @@ import {
   TablePagination,
   debounce,
   TableSortLabel,
+  Tooltip,
 } from "@mui/material";
 import {
   Column,
@@ -160,22 +161,22 @@ function rowContent(
             sx={{ cursor: "pointer" }}
             onClick={() => handleSelectItem(row.id)}
           >
-            {/* <Tooltip title={value}> */}
-            <Typography
-              variant="subtitle2"
-              noWrap
-              color="text.secondary"
-              sx={{
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {typeof value === "string"
-                ? value.charAt(0).toUpperCase() + value.slice(1)
-                : value}
-            </Typography>
-            {/* </Tooltip> */}
+            <Tooltip title={value}>
+              <Typography
+                variant="subtitle2"
+                noWrap
+                color="text.secondary"
+                sx={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {typeof value === "string"
+                  ? value.charAt(0).toUpperCase() + value.slice(1)
+                  : value}
+              </Typography>
+            </Tooltip>
           </TableCell>
         );
       })}

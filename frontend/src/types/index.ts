@@ -6,8 +6,19 @@ import {
   QueryDefinition,
 } from "@reduxjs/toolkit/query";
 import { ListResult } from "pocketbase";
-import { ExpenseConcept, Expense } from "src/interfaces";
+import {
+  ExpenseConcept,
+  Expense,
+  Client,
+  Product,
+  Field,
+  Rental,
+  Ball,
+} from "src/interfaces";
 
+/**
+ * table
+ */
 export interface IColumn<T> {
   id: keyof T;
   label: string;
@@ -19,20 +30,41 @@ export interface IColumn<T> {
 export type Order = "asc" | "desc";
 
 // all the app entities goes here
-export type Item = Expense | ExpenseConcept;
+export type Item =
+  | Expense
+  | ExpenseConcept
+  | Product
+  | Client
+  | Field
+  | Rental
+  | Ball;
 
 // modal configuration
-export type Entity = "expenses" | "expense_concepts";
 export type Action = "create" | "update" | "delete";
+export type Entity =
+  | "expenses"
+  | "expense_concepts"
+  | "products"
+  | "clients"
+  | "fields"
+  | "rentals"
+  | "balls";
 
 // we have to create this Type due to this error message:
 // "The expected type comes from property 'columns' which is declared here on type 'IntrinsicAttributes & DataGridProps'."
-export type Column = IColumn<Expense>[] | IColumn<ExpenseConcept>[];
+export type Column =
+  | IColumn<Expense>[]
+  | IColumn<ExpenseConcept>[]
+  | IColumn<Product>[]
+  | IColumn<Client>[]
+  | IColumn<Field>[]
+  | IColumn<Rental>[]
+  | IColumn<Ball>[];
 
 export interface IMenuItem {
-  text: string;
+  text?: string;
   icon?: React.ReactNode;
-  to: string;
+  to?: string;
   onClick?: () => void;
   nestedItems?: IMenuItem[];
 }

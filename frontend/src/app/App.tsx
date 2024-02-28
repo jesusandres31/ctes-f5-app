@@ -1,5 +1,5 @@
-import React, { lazy, Suspense, useEffect } from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import React, { lazy, Suspense } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { NotFound, SignIn, Unauthorized } from "src/pages";
 import {
   Dashboard,
@@ -29,6 +29,21 @@ const Sales = lazy(() =>
 const Products = lazy(() =>
   import("src/pages").then((module) => ({ default: module.Products }))
 );
+const StatsClients = lazy(() =>
+  import("src/pages").then((module) => ({ default: module.StatsClients }))
+);
+const StatsIncomes = lazy(() =>
+  import("src/pages").then((module) => ({ default: module.StatsIncomes }))
+);
+const StatsProducts = lazy(() =>
+  import("src/pages").then((module) => ({ default: module.StatsProducts }))
+);
+const Fields = lazy(() =>
+  import("src/pages").then((module) => ({ default: module.Fields }))
+);
+const Balls = lazy(() =>
+  import("src/pages").then((module) => ({ default: module.Balls }))
+);
 
 const privateRoutes = [
   {
@@ -54,6 +69,26 @@ const privateRoutes = [
   {
     route: AppRoutes.Products,
     render: <Products />,
+  },
+  {
+    route: AppRoutes.Fields,
+    render: <Fields />,
+  },
+  {
+    route: AppRoutes.Balls,
+    render: <Balls />,
+  },
+  {
+    route: AppRoutes.StatsClients,
+    render: <StatsClients />,
+  },
+  {
+    route: AppRoutes.StatsIncomes,
+    render: <StatsIncomes />,
+  },
+  {
+    route: AppRoutes.StatsProducts,
+    render: <StatsProducts />,
   },
 ];
 

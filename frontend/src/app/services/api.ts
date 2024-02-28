@@ -57,6 +57,11 @@ export const ApiTag = {
   Users: "users",
   Expenses: "expenses",
   ExpenseConcepts: "expense_concepts",
+  Products: "products",
+  Clients: "clients",
+  Fields: "fields",
+  Balls: "balls",
+  Rentals: "rentals",
 };
 
 export const mainApi = createApi({
@@ -69,6 +74,6 @@ export const mainApi = createApi({
 /**
  * utils
  */
-export const getPbOrder = (order: Order): PBOrder => {
+export const getPocketBaseOrder = (order: Order): PBOrder => {
   return order === "asc" ? "+" : "-";
 };

@@ -5,10 +5,16 @@ import * as Yup from "yup";
 import CreateOrUpdateModal from "src/components/common/Modals/CreateOrUpdateModal";
 import { MSG, VLDN, NumericFormatFloat } from "src/utils/FormUtils";
 import { useAppDispatch } from "src/app/store";
-import { closeModal, setSnackbar, useUISelector } from "src/slices/ui/uiSlice";
+import {
+  closeModal,
+  resetSelectedItems,
+  setSnackbar,
+  useUISelector,
+} from "src/slices/ui/uiSlice";
 import { expenseConceptApi } from "src/app/services/expenseConceptService";
 import { Input } from "src/types";
 import { useEffect } from "react";
+import { useModal } from "src/hooks";
 
 interface CreateOrUpdateExpenseConceptProps {
   open: boolean;
@@ -27,7 +33,7 @@ export default function CreateOrUpdateExpenseConcept({
     expenseConceptApi.useUpdateExpenseConceptMutation();
   const [getExpenseConcept, { isFetching }] =
     expenseConceptApi.useLazyGetExpenseConceptQuery();
-  const isUpdate = !!actionModal.update && selectedItems.length === 1;
+  const { isUpdate } = useModal();
 
   const handleGetExpenseConcept = async (id: string) => {
     try {
@@ -78,6 +84,7 @@ export default function CreateOrUpdateExpenseConcept({
       } catch (err) {
         throw err;
       }
+      dispatch(resetSelectedItems());
     },
     validationSchema: Yup.object({
       name: Yup.string()

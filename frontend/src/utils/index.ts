@@ -37,8 +37,8 @@ export const formatNulls = (value: any) => {
   return value;
 };
 
-export const formatMoney = (num: number) => {
-  if (isNaN(num)) {
+export const formatMoney = (num: number | "") => {
+  if (isNaN(Number(num))) {
     return "NaN";
   }
   const formattedPrice = num.toLocaleString("en-US", {

@@ -8,11 +8,6 @@ export const useRouter = () => {
     navigate(path);
   };
 
-  const getRouteTitle = () => {
-    let str = location.pathname.replace(/\//g, "");
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
-
   const getRoute = () => {
     return location.pathname;
   };
@@ -21,7 +16,6 @@ export const useRouter = () => {
 
   return {
     handleGoTo,
-    getRouteTitle,
     getRoute,
     route,
   };

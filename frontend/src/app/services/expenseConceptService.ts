@@ -1,14 +1,14 @@
 import {
   ExpenseConcept,
   CreateExpenseConceptReq,
-  UpdateExpenseConceptReq,
+  UpdateItemReq,
 } from "src/interfaces";
-import { ApiTag, getPbOrder, mainApi } from "./api";
+import { ApiTag, getPocketBaseOrder, mainApi } from "./api";
 import { pb } from "src/libs";
 import { ListResult } from "pocketbase";
 import { GetList } from "src/types";
 
-enum Field {
+enum Prop {
   name = "name",
   detail = "detail",
   unit_price = "unit_price",
@@ -25,12 +25,12 @@ export const expenseConceptApi = mainApi.injectEndpoints({
           .getList<ExpenseConcept>(_arg.page, _arg.perPage, {
             sort:
               _arg.order && _arg.orderBy
-                ? `${getPbOrder(_arg.order)}${_arg.orderBy}`
+                ? `${getPocketBaseOrder(_arg.order)}${_arg.orderBy}`
                 : "",
             filter: _arg.filter
-              ? `${Field.name} ~ "${_arg.filter}" || 
-                ${Field.detail} ~ "${_arg.filter}" ||
-                ${Field.unit_price} ~ "${_arg.filter}"
+              ? `${Prop.name} ~ "${_arg.filter}" || 
+                ${Prop.detail} ~ "${_arg.filter}" ||
+                ${Prop.unit_price} ~ "${_arg.filter}"
               `
               : "",
           });
@@ -57,7 +57,7 @@ export const expenseConceptApi = mainApi.injectEndpoints({
     }),
     updateExpenseConcept: build.mutation<
       ExpenseConcept,
-      UpdateExpenseConceptReq
+      UpdateItemReq<CreateExpenseConceptReq>
     >({
       queryFn: async (_arg, _api, _options) => {
         const res = await pb

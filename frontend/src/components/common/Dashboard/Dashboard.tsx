@@ -24,19 +24,22 @@ import {
   MenuRounded,
   FileUploadRounded,
   SportsSoccerRounded,
+  GolfCourseRounded,
   StorefrontRounded,
   ShoppingCartRounded,
   PeopleRounded,
-  PresentToAllRounded,
   ExpandLess,
   ExpandMore,
+  DataSaverOffRounded,
+  LocalActivityRounded,
+  CurrencyExchangeRounded,
 } from "@mui/icons-material";
 import { AppRoutes, version } from "src/config";
-import { useRouter } from "src/hooks/useRouter";
+import { useRouter } from "src/hooks";
 import LoginButton from "./content/LoginButton";
 import { DrawerSection, IMenuItem } from "src/types";
 import { useIsMobile } from "src/hooks";
-import { translateTitle } from "src/constants";
+import { removeForeslash, translateTitle } from "src/constants";
 
 const DRAWER_WIDTH = 230;
 
@@ -45,36 +48,63 @@ const DRAWER_SECTIONS: DrawerSection[] = [
     title: "Menu",
     menuItems: [
       {
-        text: "Alquileres",
-        icon: <SportsSoccerRounded />,
+        icon: <LocalActivityRounded />,
         to: AppRoutes.Rentals,
       },
       {
-        text: "Ventas",
         icon: <StorefrontRounded />,
         to: AppRoutes.Sales,
       },
       {
-        text: "Productos",
+        icon: <CurrencyExchangeRounded />,
+        to: AppRoutes.Expenses,
+      },
+      {
         icon: <ShoppingCartRounded />,
         to: AppRoutes.Products,
       },
       {
-        text: "Clientes",
         icon: <PeopleRounded />,
         to: AppRoutes.Clients,
       },
+    ],
+  },
+  {
+    title: "Reportes",
+    menuItems: [
       {
-        text: "Egresos",
-        icon: <FileUploadRounded />,
-        to: AppRoutes.Expenses,
+        text: "Estadisticas",
+        icon: <DataSaverOffRounded />,
+        to: "",
         nestedItems: [
           {
-            text: "Concept. Egresos",
-            icon: <PresentToAllRounded />,
-            to: AppRoutes.ExpenseConcepts,
+            to: AppRoutes.StatsIncomes,
+          },
+          {
+            to: AppRoutes.StatsProducts,
+          },
+          {
+            to: AppRoutes.StatsClients,
           },
         ],
+      },
+    ],
+  },
+  {
+    title: "Administrar",
+    menuItems: [
+      {
+        icon: <SportsSoccerRounded />,
+        to: AppRoutes.Balls,
+      },
+      {
+        icon: <GolfCourseRounded />,
+        to: AppRoutes.Fields,
+      },
+      {
+        text: "Cpto. Egresos",
+        icon: <FileUploadRounded />,
+        to: AppRoutes.ExpenseConcepts,
       },
     ],
   },
@@ -89,7 +119,7 @@ interface CustomListProps {
 const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
   const { handleGoTo, getRoute } = useRouter();
   const theme = useTheme();
-  const isSelected = (path: string) => getRoute() === path;
+  const isSelected = (path?: string) => getRoute() === path;
   const backgroundColor = darken(theme.palette.background.default, 0.08);
   const borderRadius = 8;
 
@@ -106,10 +136,10 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
         </ListSubheader>
       }
     >
-      {items.map((item) => {
+      {items.map((item, index) => {
         const [open, setOpen] = useState(false);
 
-        const handleClick = (
+        const handleCollapse = (
           e: React.MouseEvent<HTMLDivElement, MouseEvent>
         ) => {
           setOpen(!open);
@@ -117,9 +147,8 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
         };
 
         return (
-          <>
+          <React.Fragment key={`${index}-${item.to}`}>
             <ListItem
-              key={item.text}
               disablePadding
               selected={isSelected(item.to)}
               sx={{
@@ -131,7 +160,7 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
                   borderRadius,
                 },
                 "&:hover": {
-                  backgroundColor,
+                  backgroundColor: item.to ? backgroundColor : "transparent",
                   borderRadius,
                 },
                 "&.Mui-selected:hover": {
@@ -144,8 +173,8 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
               }}
             >
               <ListItemButton
-                onClick={() => {
-                  handleGoTo(item.to);
+                onClick={(e) => {
+                  item.to ? handleGoTo(item.to) : handleCollapse(e);
                 }}
                 sx={{
                   "&:hover": {
@@ -180,7 +209,7 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
                           : "text.secondary"
                       }
                     >
-                      {item.text}
+                      {item.text || translateTitle(removeForeslash(item.to))}
                     </Typography>
                   }
                 />
@@ -192,7 +221,7 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
                       color: theme.palette.text.disabled,
                       padding: 5,
                     }}
-                    onClick={(e) => handleClick(e)}
+                    onClick={(e) => handleCollapse(e)}
                   >
                     {open ? <ExpandLess /> : <ExpandMore />}
                   </div>
@@ -204,7 +233,7 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
                 <CustomList items={item.nestedItems} isNested={true} />
               </Collapse>
             )}
-          </>
+          </React.Fragment>
         );
       })}
     </List>
@@ -280,7 +309,7 @@ export default function Dashboard() {
               </IconButton>
             </Grid>
             <Grid item>
-              <Typography variant="subtitle1" noWrap component="div">
+              <Typography variant="h6" noWrap component="div">
                 {translateTitle(route)}
               </Typography>
             </Grid>

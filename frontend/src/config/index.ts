@@ -25,11 +25,16 @@ export enum AppRoutes {
   Rentals = "/rentals",
   Sales = "/sales",
   Products = "/products",
+  Fields = "/fields",
+  Balls = "/balls",
+  StatsIncomes = "/stats/incomes",
+  StatsClients = "/stats/clients",
+  StatsProducts = "/stats/products",
 }
 
 // general config
 export const conf = {
-  LANDING_PAGE: AppRoutes.Expenses, // TODO: change this,
+  LANDING_PAGE: AppRoutes.Sales,
   AUTHORIZATION: "Authorization",
   TOKEN_PREFIX: "User",
 };

@@ -1,5 +1,5 @@
-import { CreateExpenseReq, Expense, UpdateExpenseReq } from "src/interfaces";
-import { ApiTag, getPbOrder, mainApi } from "./api";
+import { CreateExpenseReq, Expense, UpdateItemReq } from "src/interfaces";
+import { ApiTag, getPocketBaseOrder, mainApi } from "./api";
 import { pb } from "src/libs";
 import { ListResult } from "pocketbase";
 import { GetList } from "src/types";
@@ -8,7 +8,7 @@ enum FK {
   expense_concept = "expense_concept",
 }
 
-enum Field {
+enum Prop {
   name = "name",
   detail = "detail",
   amount = "amount",
@@ -18,6 +18,8 @@ enum Field {
 
 const TAG = ApiTag.Expenses;
 
+const expand = `${FK.expense_concept}`;
+
 export const expenseApi = mainApi.injectEndpoints({
   endpoints: (build) => ({
     getExpenses: build.query<ListResult<Expense>, GetList>({
@@ -25,18 +27,18 @@ export const expenseApi = mainApi.injectEndpoints({
         const res = await pb
           .collection(TAG)
           .getList<Expense>(_arg.page, _arg.perPage, {
-            expand: FK.expense_concept,
+            expand,
             sort:
               _arg.order && _arg.orderBy
-                ? `${getPbOrder(_arg.order)}${_arg.orderBy}`
+                ? `${getPocketBaseOrder(_arg.order)}${_arg.orderBy}`
                 : "",
             filter: _arg.filter
-              ? `${Field.name} ~ "${_arg.filter}" ||
-                ${Field.detail} ~ "${_arg.filter}" ||
-                ${Field.amount} ~ "${_arg.filter}" ||
-                ${Field.unit_price} ~ "${_arg.filter}" ||
-                ${Field.total} ~ "${_arg.filter}" ||
-                ${FK.expense_concept}.${Field.name} ~ "${_arg.filter}"
+              ? `${Prop.name} ~ "${_arg.filter}" ||
+                ${Prop.detail} ~ "${_arg.filter}" ||
+                ${Prop.amount} ~ "${_arg.filter}" ||
+                ${Prop.unit_price} ~ "${_arg.filter}" ||
+                ${Prop.total} ~ "${_arg.filter}" ||
+                ${FK.expense_concept}.${Prop.name} ~ "${_arg.filter}"
               `
               : "",
           });
@@ -46,9 +48,7 @@ export const expenseApi = mainApi.injectEndpoints({
     }),
     getExpense: build.query<Expense, string>({
       queryFn: async (_arg, _api, _options) => {
-        const res = await pb
-          .collection(TAG)
-          .getOne<Expense>(_arg, { expand: FK.expense_concept });
+        const res = await pb.collection(TAG).getOne<Expense>(_arg, { expand });
         return { data: res };
       },
       providesTags: [TAG],
@@ -60,7 +60,7 @@ export const expenseApi = mainApi.injectEndpoints({
       },
       invalidatesTags: [TAG],
     }),
-    updateExpense: build.mutation<Expense, UpdateExpenseReq>({
+    updateExpense: build.mutation<Expense, UpdateItemReq<CreateExpenseReq>>({
       queryFn: async (_arg, _api, _options) => {
         const res = await pb
           .collection(TAG)

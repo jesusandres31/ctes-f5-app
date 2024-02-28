@@ -1,16 +1,8 @@
-import { ExpenseConcept } from ".";
+import { BaseItem, ExpenseConcept } from ".";
 
-export interface Expense {
-  id: string;
-  expense_concept: string;
-  detail: string;
-  amount: number;
-  unit_price: number;
-  total: number;
-  created: Date;
-  updated: Date;
-  expand: { expense_concept: ExpenseConcept };
-}
+export interface Expense
+  extends BaseItem<{ expense_concept: ExpenseConcept }>,
+    CreateExpenseReq {}
 
 export interface CreateExpenseReq {
   expense_concept: string;
@@ -18,9 +10,4 @@ export interface CreateExpenseReq {
   amount: number | "";
   unit_price: number | "";
   total: number | "";
-}
-
-export interface UpdateExpenseReq {
-  id: string;
-  data: CreateExpenseReq;
 }

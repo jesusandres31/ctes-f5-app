@@ -20,7 +20,7 @@ export const PAGE = {
 /**
  * title
  */
-export const translateTitle = (title: string) => {
+export const translateTitle = (title?: string) => {
   switch (title) {
     case AppRoutes.Expenses:
       return "Egresos";
@@ -34,7 +34,22 @@ export const translateTitle = (title: string) => {
       return "Ventas";
     case AppRoutes.Products:
       return "Productos";
+    case AppRoutes.Fields:
+      return "Canchas";
+    case AppRoutes.Balls:
+      return "Pelotas";
+    case AppRoutes.StatsIncomes:
+      return "Ventas";
+    case AppRoutes.StatsClients:
+      return "Clientes";
+    case AppRoutes.StatsProducts:
+      return "Productos";
     default:
       return title;
   }
+};
+
+export const removeForeslash = (str?: string) => {
+  str = str || "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
 };

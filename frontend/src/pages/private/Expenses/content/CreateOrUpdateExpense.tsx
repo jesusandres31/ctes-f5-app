@@ -7,6 +7,7 @@ import { MSG, VLDN, NumericFormatFloat } from "src/utils/FormUtils";
 import { useAppDispatch } from "src/app/store";
 import {
   closeModal,
+  resetSelectedItems,
   setSnackbar,
   uiInitialState,
   useUISelector,
@@ -15,6 +16,7 @@ import { expenseApi } from "src/app/services/expenseService";
 import { Input } from "src/types";
 import { useEffect } from "react";
 import { expenseConceptApi } from "src/app/services/expenseConceptService";
+import { useModal } from "src/hooks";
 
 interface CreateOrUpdateExpenseProps {
   open: boolean;
@@ -31,13 +33,13 @@ export default function CreateOrUpdateExpense({
     expenseApi.useCreateExpenseMutation();
   const [updateExpense, { isLoading: isUpdating }] =
     expenseApi.useUpdateExpenseMutation();
+  const [getExpense, { data: expense, isFetching }] =
+    expenseApi.useLazyGetExpenseQuery();
   const [
     getExpenseConcepts,
     { data: expenseConcepts, isFetching: isFetchinExpCep },
   ] = expenseConceptApi.useLazyGetExpenseConceptsQuery();
-  const [getExpense, { data: expense, isFetching }] =
-    expenseApi.useLazyGetExpenseQuery();
-  const isUpdate = !!actionModal.update && selectedItems.length === 1;
+  const { isUpdate } = useModal();
 
   const handleGetExpense = async (id: string) => {
     try {
@@ -114,10 +116,11 @@ export default function CreateOrUpdateExpense({
             })
           );
         }
+        handleClose();
       } catch (err) {
         throw err;
       }
-      handleClose();
+      dispatch(resetSelectedItems());
     },
     validationSchema: Yup.object({
       expense_concept: Yup.string()

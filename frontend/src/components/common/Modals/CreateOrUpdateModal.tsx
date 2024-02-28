@@ -8,7 +8,7 @@ import {
   TextField,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import { Input, Item } from "src/types";
+import { Input } from "src/types";
 import { handleSetFormikValue } from "src/utils/FormUtils";
 import { STYLE } from "src/constants";
 import { FormikProps } from "formik";
@@ -87,7 +87,7 @@ export default function CreateOrUpdateModal({
                   name={input.id}
                   value={input.value}
                   multiline={input.multiline}
-                  placeholder="Placeholder"
+                  placeholder={""}
                   onChange={(e) => handleSetFormikValue(e, formik, input.id)}
                   autoComplete="off"
                   error={!!input.error}
