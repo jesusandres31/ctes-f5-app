@@ -19,3 +19,13 @@ admin123456
 test@test.com
 12345678
 ```
+
+## go
+
+go get -u modernc.org/sqlite
+
+## air
+
+air init
+
+air

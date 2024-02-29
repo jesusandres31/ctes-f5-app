@@ -51,7 +51,7 @@ export default function CreateOrUpdateRental({
       formik.setValues({
         client: payload.expand.client.id,
         field: payload.expand.field.id,
-        ball: payload.expand.ball,
+        ball: payload.ball,
         hours_amount: payload.hours_amount,
         started_at: payload.started_at,
         total: payload.total,
@@ -62,9 +62,37 @@ export default function CreateOrUpdateRental({
     }
   };
 
-  const handleGetExpenseConcepts = async () => {
+  const handleGetClients = async () => {
     try {
-      await getExpenseConcepts({
+      await getClients({
+        page: uiInitialState.page,
+        perPage: uiInitialState.perPage,
+        filter: uiInitialState.filter,
+        order: uiInitialState.order,
+        orderBy: uiInitialState.orderBy,
+      }).unwrap();
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const handleGetFields = async () => {
+    try {
+      await getFields({
+        page: uiInitialState.page,
+        perPage: uiInitialState.perPage,
+        filter: uiInitialState.filter,
+        order: uiInitialState.order,
+        orderBy: uiInitialState.orderBy,
+      }).unwrap();
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const handleGetBalls = async () => {
+    try {
+      await getBalls({
         page: uiInitialState.page,
         perPage: uiInitialState.perPage,
         filter: uiInitialState.filter,
@@ -77,7 +105,9 @@ export default function CreateOrUpdateRental({
   };
 
   useEffect(() => {
-    handleGetExpenseConcepts();
+    handleGetClients();
+    handleGetFields();
+    handleGetBalls();
   }, []);
 
   useEffect(() => {
@@ -100,7 +130,7 @@ export default function CreateOrUpdateRental({
     initialValues: {
       client: "",
       field: "",
-      ball: "",
+      ball: [],
       hours_amount: "",
       started_at: new Date(),
       total: "",
@@ -155,8 +185,8 @@ export default function CreateOrUpdateRental({
     validateOnBlur: false,
   });
 
-  const inputs: Input<ExpenseConcept>[] = [
-    {
+  const inputs: Input<any>[] = [
+    /* {
       required: true,
       label: "Concepto",
       id: "expense_concept",
@@ -218,7 +248,7 @@ export default function CreateOrUpdateRental({
         inputComponent: NumericFormatFloat as any,
         startAdornment: <InputAdornment position="start">$</InputAdornment>,
       },
-    },
+    }, */
   ];
 
   return (
