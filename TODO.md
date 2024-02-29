@@ -12,3 +12,5 @@ Hora, nombre, pelota, cancha, monto, medio de pago, aunque muchas veces te pagan
 Si es más de una se le anota dos veces xq son dos horas de alquiler diferente en realidad
 
 add tabla Metodo de pago, y rental_paidment
+
+cambiar tipo dato en rentals <ball>
