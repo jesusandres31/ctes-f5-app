@@ -44,6 +44,9 @@ const Fields = lazy(() =>
 const Balls = lazy(() =>
   import("src/pages").then((module) => ({ default: module.Balls }))
 );
+const PaymenMethods = lazy(() =>
+  import("src/pages").then((module) => ({ default: module.PaymenMethods }))
+);
 
 const privateRoutes = [
   {
@@ -77,6 +80,10 @@ const privateRoutes = [
   {
     route: AppRoutes.Balls,
     render: <Balls />,
+  },
+  {
+    route: AppRoutes.PaymenMethods,
+    render: <PaymenMethods />,
   },
   {
     route: AppRoutes.StatsClients,

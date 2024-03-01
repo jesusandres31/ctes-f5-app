@@ -27,6 +27,7 @@ export enum AppRoutes {
   Products = "/products",
   Fields = "/fields",
   Balls = "/balls",
+  PaymenMethods = "/payment-methods",
   StatsIncomes = "/stats/incomes",
   StatsClients = "/stats/clients",
   StatsProducts = "/stats/products",

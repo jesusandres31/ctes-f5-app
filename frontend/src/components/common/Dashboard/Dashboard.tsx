@@ -32,6 +32,7 @@ import {
   ExpandMore,
   DataSaverOffRounded,
   LocalActivityRounded,
+  ConstructionRounded,
   CurrencyExchangeRounded,
 } from "@mui/icons-material";
 import { AppRoutes, version } from "src/config";
@@ -70,6 +71,30 @@ const DRAWER_SECTIONS: DrawerSection[] = [
     ],
   },
   {
+    title: "Config",
+    menuItems: [
+      {
+        text: "Administrar",
+        icon: <ConstructionRounded />,
+        to: "",
+        nestedItems: [
+          {
+            to: AppRoutes.Balls,
+          },
+          {
+            to: AppRoutes.Fields,
+          },
+          {
+            to: AppRoutes.ExpenseConcepts,
+          },
+          {
+            to: AppRoutes.PaymenMethods,
+          },
+        ],
+      },
+    ],
+  },
+  {
     title: "Reportes",
     menuItems: [
       {
@@ -87,24 +112,6 @@ const DRAWER_SECTIONS: DrawerSection[] = [
             to: AppRoutes.StatsClients,
           },
         ],
-      },
-    ],
-  },
-  {
-    title: "Administrar",
-    menuItems: [
-      {
-        icon: <SportsSoccerRounded />,
-        to: AppRoutes.Balls,
-      },
-      {
-        icon: <GolfCourseRounded />,
-        to: AppRoutes.Fields,
-      },
-      {
-        text: "Cpto. Egresos",
-        icon: <FileUploadRounded />,
-        to: AppRoutes.ExpenseConcepts,
       },
     ],
   },

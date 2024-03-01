@@ -44,6 +44,8 @@ export const translateTitle = (title?: string) => {
       return "Clientes";
     case AppRoutes.StatsProducts:
       return "Productos";
+    case AppRoutes.PaymenMethods:
+      return "Metodos de Pago";
     default:
       return title;
   }
