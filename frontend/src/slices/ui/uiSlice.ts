@@ -5,11 +5,6 @@ import { RootState } from "src/app/store";
 import { Action, Entity, Order } from "src/types";
 import { PAGE } from "src/constants";
 
-interface ICollapse {
-  id: number;
-  open: boolean;
-}
-
 interface ISnackbar {
   message: string;
   type?: AlertColor;
@@ -24,7 +19,7 @@ interface IActionModal {
 
 interface IUIState {
   openDrawer: boolean;
-  collapse: number | null;
+  collapseItem: string;
   navbar: string | null;
   snackbar: ISnackbar;
   selectedItems: string[];
@@ -38,7 +33,7 @@ interface IUIState {
 
 export const uiInitialState: IUIState = {
   openDrawer: false,
-  collapse: null,
+  collapseItem: "",
   navbar: null,
   snackbar: {
     message: "",
@@ -58,8 +53,8 @@ export const uiInitialState: IUIState = {
   },
 };
 
-export const isCollapsed = (collapsedItems: ICollapse[], itemId: number) => {
-  return collapsedItems.some((item) => item.id === itemId);
+export const isCollapsed = (collapseItem: string, itemId: string) => {
+  return collapseItem === itemId;
 };
 
 export const isSelected = (selectedItems: string[], itemId: string) => {
@@ -73,8 +68,8 @@ const ui = createSlice({
     toggleOpenDrawer(state: IUIState) {
       state.openDrawer = !state.openDrawer;
     },
-    setCollapse(state: IUIState, { payload }: PayloadAction<number | null>) {
-      state.collapse = payload;
+    setCollapse(state: IUIState, { payload }: PayloadAction<string>) {
+      state.collapseItem = payload;
     },
     setNavbar(state: IUIState, { payload }: PayloadAction<string | null>) {
       state.navbar = payload;
@@ -124,6 +119,9 @@ const ui = createSlice({
     resetPage(state: IUIState) {
       state.page = uiInitialState.page;
     },
+    resetCollapse(state: IUIState) {
+      state.collapseItem = uiInitialState.collapseItem;
+    },
     openModal(
       state: IUIState,
       { payload }: PayloadAction<{ action: Action; entity: Entity }>
@@ -158,6 +156,7 @@ export const {
   resetSelectedItems,
   resetFilter,
   resetPage,
+  resetCollapse,
   openModal,
   closeModal,
 } = ui.actions;

@@ -1,5 +1,5 @@
 import { PromiseStatus } from "src/types";
-import { fieldApi } from "src/app/services/fieldService";
+import { paymentMethodApi } from "src/app/services/paymentMethodService";
 import { useAppDispatch } from "src/app/store";
 import {
   resetSelectedItems,
@@ -9,19 +9,22 @@ import {
 import DeleteModal from "src/components/common/Modals/DeleteModal";
 import { MSG } from "src/utils/FormUtils";
 
-interface DeleteFieldsProps {
+interface DeletePaymentMethodsProps {
   open: boolean;
   label: string;
 }
 
-export default function DeleteFields({ open, label }: DeleteFieldsProps) {
+export default function DeletePaymentMethods({
+  open,
+  label,
+}: DeletePaymentMethodsProps) {
   const dispatch = useAppDispatch();
   const { selectedItems } = useUISelector((state) => state.ui);
-  const [deleteField, { isLoading: isDeleting }] =
-    fieldApi.useDeleteFieldMutation();
+  const [deletePaymentMethod, { isLoading: isDeleting }] =
+    paymentMethodApi.useDeletePaymentMethodMutation();
 
   const handleDelete = async () => {
-    const res = await deleteField(selectedItems).unwrap();
+    const res = await deletePaymentMethod(selectedItems).unwrap();
     if (res.every((item) => item.status === PromiseStatus.FULFILLED)) {
       dispatch(resetSelectedItems());
       dispatch(setSnackbar({ message: MSG.successDelete(res.length) }));

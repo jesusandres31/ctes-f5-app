@@ -15,6 +15,9 @@ import {
   debounce,
   TableSortLabel,
   Tooltip,
+  Box,
+  Collapse,
+  IconButton,
 } from "@mui/material";
 import {
   Column,
@@ -32,10 +35,13 @@ import PageContainer from "../PageContainer/PageContainer";
 import NoItems from "../NoItems";
 import { useIsMobile } from "src/hooks";
 import {
+  isCollapsed,
   isSelected,
+  resetCollapse,
   resetFilter,
   resetPage,
   resetSelectedItems,
+  setCollapse,
   setFilter,
   setOrderBy,
   setPage,
@@ -48,32 +54,106 @@ import { useAppDispatch } from "src/app/store";
 import { ListResult } from "pocketbase";
 import TableToolbar from "./content/TableToolbar";
 import { CustomGrid } from "./content/utils";
+import {
+  KeyboardArrowDownRounded,
+  KeyboardArrowUpRounded,
+} from "@mui/icons-material";
 
-// move VirtuosoTableComponents outside DataGrid
-// because it causes a constant re rendering on select item.
-const VirtuosoTableComponents: TableComponents<Item> = {
-  Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
-    <TableContainer {...props} ref={ref} />
-  )),
-  Table: (props) => (
-    <Table
-      {...props}
-      sx={{
-        borderCollapse: "separate",
-        tableLayout: "fixed",
-      }}
-    />
-  ),
-  TableHead,
-  TableRow: ({ item: _item, ...props }) => {
-    const { selectedItems } = useUISelector((state) => state.ui);
-    return (
-      <TableRow selected={isSelected(selectedItems, _item.id)} {...props} />
-    );
-  },
-  TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
-    <TableBody {...props} ref={ref} />
-  )),
+const components = (
+  selectedItems: string[],
+  collapseItem: string,
+  columnsLength: number
+) => {
+  const VirtuosoTableComponents: TableComponents<Item> = {
+    Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
+      <TableContainer {...props} ref={ref} />
+    )),
+    Table: (props) => (
+      <Table
+        {...props}
+        sx={{
+          borderCollapse: "separate",
+          tableLayout: "fixed",
+        }}
+      />
+    ),
+    TableHead,
+    TableRow: ({ item: _item, ...props }) => {
+      return (
+        <React.Fragment>
+          <TableRow
+            selected={isSelected(selectedItems, _item.id)}
+            sx={{
+              "& > *": { borderBottom: "unset" },
+            }}
+            {...props}
+          />
+          <TableRow>
+            <TableCell
+              sx={{ paddingBottom: 0, paddingTop: 0 }}
+              colSpan={
+                // + 2 because of the checkbox and collapse cell.
+                columnsLength + 2
+              }
+            >
+              <Collapse
+                in={isCollapsed(collapseItem, _item.id)}
+                timeout="auto"
+                unmountOnExit
+              >
+                <Box sx={{ margin: 1 }}>
+                  <Typography variant="h6" gutterBottom component="div">
+                    History
+                  </Typography>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Date</TableCell>
+                        <TableCell>Customer</TableCell>
+                        <TableCell align="right">Amount</TableCell>
+                        <TableCell align="right">Total price ($)</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {[
+                        {
+                          date: "2020-01-05",
+                          customerId: "11091700",
+                          amount: 3,
+                        },
+                        {
+                          date: "2020-01-02",
+                          customerId: "Anonymous",
+                          amount: 1,
+                        },
+                      ].map((historyRow) => (
+                        <TableRow key={historyRow.date}>
+                          <TableCell component="th" scope="row">
+                            {historyRow.date}
+                          </TableCell>
+                          <TableCell>{historyRow.customerId}</TableCell>
+                          <TableCell align="right">
+                            {historyRow.amount}
+                          </TableCell>
+                          <TableCell align="right">
+                            {Math.round(historyRow.amount)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Box>
+              </Collapse>
+            </TableCell>
+          </TableRow>
+        </React.Fragment>
+      );
+    },
+    TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
+      <TableBody {...props} ref={ref} />
+    )),
+  };
+  return VirtuosoTableComponents;
 };
 
 function fixedHeaderContent(
@@ -125,6 +205,15 @@ function fixedHeaderContent(
           </TableSortLabel>
         </TableCell>
       ))}
+
+      <TableCell
+        padding="checkbox"
+        sx={{
+          backgroundColor: "background.paper",
+          position: "sticky",
+          paddingBlock: 0,
+        }}
+      />
     </TableRow>
   );
 }
@@ -134,7 +223,10 @@ function rowContent(
   row: Item,
   columns: IColumn<Item>[],
   isSelected: boolean,
-  handleSelectItem: (item: string) => void
+  isItemCollapsed: boolean,
+  handleSelectItem: (item: string) => void,
+  handleCollapse: (id: string) => void,
+  isCollapse: boolean = true
 ) {
   return (
     <>
@@ -145,6 +237,7 @@ function rowContent(
           onClick={() => handleSelectItem(row.id)}
         />
       </TableCell>
+
       {columns.map((column) => {
         const value = column.render
           ? column.render(row)
@@ -180,6 +273,24 @@ function rowContent(
           </TableCell>
         );
       })}
+
+      {isCollapse ? (
+        <TableCell
+          sx={{
+            position: "sticky",
+            paddingBlock: 0,
+          }}
+          onClick={() => handleCollapse(row.id)}
+        >
+          <IconButton>
+            {isItemCollapsed ? (
+              <KeyboardArrowUpRounded />
+            ) : (
+              <KeyboardArrowDownRounded />
+            )}
+          </IconButton>
+        </TableCell>
+      ) : null}
     </>
   );
 }
@@ -205,7 +316,7 @@ export default function DataGrid({
   ...rest
 }: DataGridProps) {
   const dispatch = useAppDispatch();
-  const { selectedItems, filter, order, orderBy, page, perPage } =
+  const { selectedItems, collapseItem, filter, order, orderBy, page, perPage } =
     useUISelector((state) => state.ui);
   const { isMobile } = useIsMobile();
 
@@ -255,6 +366,14 @@ export default function DataGrid({
 
   const handleSelectItem = (itemId: string) => {
     dispatch(setSelectedItems(itemId));
+  };
+
+  const handleCollapse = (id: string) => {
+    if (id === collapseItem) {
+      dispatch(resetCollapse());
+    } else {
+      dispatch(setCollapse(id));
+    }
   };
 
   const handleSelectAll = () => {
@@ -313,7 +432,7 @@ export default function DataGrid({
             flex: "1 1 auto",
           }}
           data={data?.items}
-          components={VirtuosoTableComponents}
+          components={components(selectedItems, collapseItem, columns.length)}
           fixedHeaderContent={() =>
             fixedHeaderContent(
               columns,
@@ -331,7 +450,9 @@ export default function DataGrid({
                 row,
                 columns as IColumn<Item>[],
                 isSelected(selectedItems, row.id),
-                handleSelectItem
+                isCollapsed(collapseItem, row.id),
+                handleSelectItem,
+                handleCollapse
               )
             ) : data && data.items && data.items.length === 0 ? (
               <CustomGrid>

@@ -7,7 +7,6 @@ import { GetList } from "src/types";
 enum FK {
   client = "client",
   field = "field",
-  ball = "ball",
 }
 
 enum Prop {
@@ -18,7 +17,7 @@ enum Prop {
 
 const TAG = ApiTag.Rentals;
 
-const expand = `${FK.client},${FK.field},${FK.ball}`;
+const expand = `${FK.client},${FK.field}`;
 
 export const rentalApi = mainApi.injectEndpoints({
   endpoints: (build) => ({
@@ -36,8 +35,7 @@ export const rentalApi = mainApi.injectEndpoints({
               ? `${Prop.from} ~ "${_arg.filter}" ||
                 ${Prop.to} ~ "${_arg.filter}" ||
                 ${FK.client}.${Prop.name} ~ "${_arg.filter}" ||
-                ${FK.field}.${Prop.name} ~ "${_arg.filter}" || 
-                ${FK.ball}.${Prop.name} ~ "${_arg.filter}"
+                ${FK.field}.${Prop.name} ~ "${_arg.filter}"
               `
               : "",
           });

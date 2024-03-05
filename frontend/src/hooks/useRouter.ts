@@ -8,15 +8,10 @@ export const useRouter = () => {
     navigate(path);
   };
 
-  const getRoute = () => {
-    return location.pathname;
-  };
-
   const route = location.pathname;
 
   return {
     handleGoTo,
-    getRoute,
     route,
   };
 };

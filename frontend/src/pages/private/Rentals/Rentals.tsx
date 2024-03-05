@@ -23,13 +23,6 @@ const COLUMNS: IColumn<Rental>[] = [
     render: (item) => item.expand.field.name,
   },
   {
-    minWidth: 150,
-    label: "Pelota",
-    id: "ball",
-    align: "right",
-    render: (item) => item.expand.ball.map((b) => b.name).join(", "),
-  },
-  {
     minWidth: 100,
     label: "Horas",
     id: "hours_amount",

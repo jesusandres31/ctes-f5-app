@@ -62,6 +62,7 @@ export const ApiTag = {
   Fields: "fields",
   Balls: "balls",
   Rentals: "rentals",
+  PaymentMethods: "payment_methods",
 };
 
 export const mainApi = createApi({

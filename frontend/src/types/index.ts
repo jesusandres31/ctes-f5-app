@@ -14,6 +14,7 @@ import {
   Field,
   Rental,
   Ball,
+  PaymentMethod,
 } from "src/interfaces";
 
 /**
@@ -29,16 +30,6 @@ export interface IColumn<T> {
 
 export type Order = "asc" | "desc";
 
-// all the app entities goes here
-export type Item =
-  | Expense
-  | ExpenseConcept
-  | Product
-  | Client
-  | Field
-  | Rental
-  | Ball;
-
 // modal configuration
 export type Action = "create" | "update" | "delete";
 export type Entity =
@@ -48,7 +39,19 @@ export type Entity =
   | "clients"
   | "fields"
   | "rentals"
-  | "balls";
+  | "balls"
+  | "payment_methods";
+
+// all the app entities goes here
+export type Item =
+  | Expense
+  | ExpenseConcept
+  | Product
+  | Client
+  | Field
+  | Rental
+  | Ball
+  | PaymentMethod;
 
 // we have to create this Type due to this error message:
 // "The expected type comes from property 'columns' which is declared here on type 'IntrinsicAttributes & DataGridProps'."
@@ -59,7 +62,8 @@ export type Column =
   | IColumn<Client>[]
   | IColumn<Field>[]
   | IColumn<Rental>[]
-  | IColumn<Ball>[];
+  | IColumn<Ball>[]
+  | IColumn<PaymentMethod>[];
 
 export interface IMenuItem {
   text?: string;

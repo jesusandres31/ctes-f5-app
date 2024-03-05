@@ -7,3 +7,4 @@ export * from "./Client";
 export * from "./Field";
 export * from "./Ball";
 export * from "./Rental";
+export * from "./PaymentMethod";

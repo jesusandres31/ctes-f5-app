@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import {
   Typography,
@@ -22,9 +22,6 @@ import {
 } from "@mui/material";
 import {
   MenuRounded,
-  FileUploadRounded,
-  SportsSoccerRounded,
-  GolfCourseRounded,
   StorefrontRounded,
   ShoppingCartRounded,
   PeopleRounded,
@@ -124,9 +121,9 @@ interface CustomListProps {
 }
 
 const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
-  const { handleGoTo, getRoute } = useRouter();
+  const { handleGoTo, route } = useRouter();
   const theme = useTheme();
-  const isSelected = (path?: string) => getRoute() === path;
+  const isSelected = (path?: string) => route === path;
   const backgroundColor = darken(theme.palette.background.default, 0.08);
   const borderRadius = 8;
 
@@ -144,7 +141,15 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
       }
     >
       {items.map((item, index) => {
-        const [open, setOpen] = useState(false);
+        const [open, setOpen] = useState(route === item.to);
+
+        useEffect(() => {
+          if (item.nestedItems) {
+            item.nestedItems.map((nestedItem) => {
+              if (route === nestedItem.to) setOpen(true);
+            });
+          }
+        }, []);
 
         const handleCollapse = (
           e: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -259,7 +264,7 @@ const CustomDrawer = () => {
         }}
       >
         {/* <SportsSoccerRounded sx={{ color: "background.default" }} /> */}
-        <Typography variant="subtitle1" color="background.default">
+        <Typography variant="subtitle1" color="background.paper">
           {`\xa0Ctes F5 v${version}`}
         </Typography>
       </Toolbar>
@@ -382,7 +387,11 @@ export default function Dashboard() {
         }}
       >
         <Toolbar />
-        <Box sx={{ height: isMobile ? "90%" : { sm: `calc(100% - 60px)` } }}>
+        <Box
+          sx={{
+            height: isMobile ? "90%" : { sm: `calc(100% - 60px)` },
+          }}
+        >
           <Outlet />
         </Box>
       </Box>

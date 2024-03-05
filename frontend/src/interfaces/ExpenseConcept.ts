@@ -5,5 +5,5 @@ export interface ExpenseConcept extends BaseItem<{}>, CreateExpenseConceptReq {}
 export interface CreateExpenseConceptReq {
   name: string;
   detail: string;
-  unit_price: number | "";
+  unit_price: NumberOrEmpty;
 }

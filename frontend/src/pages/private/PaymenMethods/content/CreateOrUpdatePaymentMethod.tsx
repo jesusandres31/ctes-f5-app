@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import { CreateFieldReq, Expense } from "src/interfaces";
+import { CreatePaymentMethodReq, PaymentMethod } from "src/interfaces";
 import * as Yup from "yup";
 import CreateOrUpdateModal from "src/components/common/Modals/CreateOrUpdateModal";
 import { MSG, VLDN } from "src/utils/FormUtils";
@@ -10,35 +10,36 @@ import {
   setSnackbar,
   useUISelector,
 } from "src/slices/ui/uiSlice";
-import { fieldApi } from "src/app/services/fieldService";
+import { paymentMethodApi } from "src/app/services/paymentMethodService";
 import { Input } from "src/types";
 import { useEffect } from "react";
 import { useModal } from "src/hooks";
 
-interface CreateOrUpdateFieldProps {
+interface CreateOrUpdatePaymentMethodProps {
   open: boolean;
   label: string;
 }
 
-export default function CreateOrUpdateField({
+export default function CreateOrUpdatePaymentMethod({
   open,
   label,
-}: CreateOrUpdateFieldProps) {
+}: CreateOrUpdatePaymentMethodProps) {
   const dispatch = useAppDispatch();
   const { selectedItems, actionModal } = useUISelector((state) => state.ui);
-  const [createField, { isLoading: isCreating }] =
-    fieldApi.useCreateFieldMutation();
-  const [updateField, { isLoading: isUpdating }] =
-    fieldApi.useUpdateFieldMutation();
-  const [getField, { isFetching }] = fieldApi.useLazyGetFieldQuery();
+  const [createPaymentMethod, { isLoading: isCreating }] =
+    paymentMethodApi.useCreatePaymentMethodMutation();
+  const [updatePaymentMethod, { isLoading: isUpdating }] =
+    paymentMethodApi.useUpdatePaymentMethodMutation();
+  const [getPaymentMethod, { isFetching }] =
+    paymentMethodApi.useLazyGetPaymentMethodQuery();
   const { isUpdate } = useModal();
 
-  const handleGetField = async (id: string) => {
+  const handleGetPaymentMethod = async (id: string) => {
     try {
-      const payload = await getField(id).unwrap();
+      const payload = await getPaymentMethod(id).unwrap();
       formik.setValues({
         name: payload.name,
-        price_per_hour: payload.price_per_hour,
+        detail: payload.detail,
       });
     } catch (err) {
       throw err;
@@ -47,7 +48,7 @@ export default function CreateOrUpdateField({
 
   useEffect(() => {
     if (isUpdate) {
-      handleGetField(selectedItems[0]);
+      handleGetPaymentMethod(selectedItems[0]);
     }
   }, [actionModal, selectedItems]);
 
@@ -64,16 +65,16 @@ export default function CreateOrUpdateField({
     enableReinitialize: true,
     initialValues: {
       name: "",
-      price_per_hour: "",
+      detail: "",
     },
-    onSubmit: async (data: CreateFieldReq) => {
+    onSubmit: async (data: CreatePaymentMethodReq) => {
       try {
         if (isUpdate) {
           const id = selectedItems[0];
-          const res = await updateField({ id, data }).unwrap();
+          const res = await updatePaymentMethod({ id, data }).unwrap();
           dispatch(setSnackbar({ message: MSG.successUpdate(res.name) }));
         } else {
-          const res = await createField(data).unwrap();
+          const res = await createPaymentMethod(data).unwrap();
           dispatch(setSnackbar({ message: MSG.successCreate(res.name) }));
         }
         handleClose();
@@ -87,15 +88,15 @@ export default function CreateOrUpdateField({
         .required(MSG.required)
         .min(VLDN.SHORT_STRING.min, MSG.minLength(VLDN.SHORT_STRING.min))
         .max(VLDN.SHORT_STRING.max, MSG.maxLength(VLDN.SHORT_STRING.max)),
-      price_per_hour: Yup.string()
-        .min(VLDN.NN_REAL_NUMBER.min, MSG.minLength(VLDN.NN_REAL_NUMBER.min))
-        .max(VLDN.NN_REAL_NUMBER.max, MSG.maxLength(VLDN.NN_REAL_NUMBER.max)),
+      detail: Yup.string()
+        .min(VLDN.LONG_STRING.min, MSG.minLength(VLDN.LONG_STRING.min))
+        .max(VLDN.LONG_STRING.max, MSG.maxLength(VLDN.LONG_STRING.max)),
     }),
     validateOnChange: false,
     validateOnBlur: false,
   });
 
-  const inputs: Input<Expense>[] = [
+  const inputs: Input<PaymentMethod>[] = [
     {
       required: true,
       label: "Nombre",
@@ -107,12 +108,12 @@ export default function CreateOrUpdateField({
     },
     {
       required: false,
-      label: "Precio por Hora",
-      id: "price_per_hour",
-      value: formik.values.price_per_hour,
-      error: formik.errors.price_per_hour,
-      max: VLDN.NN_REAL_NUMBER.max,
-      min: VLDN.NN_REAL_NUMBER.min,
+      label: "Detalle",
+      id: "detail",
+      value: formik.values.detail,
+      error: formik.errors.detail,
+      max: VLDN.LONG_STRING.max,
+      min: VLDN.LONG_STRING.min,
     },
   ];
 

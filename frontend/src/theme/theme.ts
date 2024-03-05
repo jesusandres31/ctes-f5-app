@@ -25,7 +25,7 @@ const theme = createTheme({
       primary: "#050505",
     },
     background: {
-      default: "#fafafa",
+      default: "#f5f5f5",
       paper: "#fafafa",
     },
     // vite

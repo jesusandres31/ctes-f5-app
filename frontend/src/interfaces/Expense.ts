@@ -7,7 +7,7 @@ export interface Expense
 export interface CreateExpenseReq {
   expense_concept: string;
   detail: string;
-  amount: number | "";
-  unit_price: number | "";
-  total: number | "";
+  amount: NumberOrEmpty;
+  unit_price: NumberOrEmpty;
+  total: NumberOrEmpty;
 }

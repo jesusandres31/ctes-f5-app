@@ -1,13 +1,13 @@
-import { Field } from "src/interfaces";
+import { PaymentMethod } from "src/interfaces";
 import { Entity, IColumn } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
-import { fieldApi } from "src/app/services/fieldService";
+import { paymentMethodApi } from "src/app/services/paymentMethodService";
 import { useUISelector } from "src/slices/ui/uiSlice";
-import CreateOrUpdateField from "./content/CreateOrUpdateField";
-import DeleteFields from "./content/DeleteFields";
-import { formatDate, formatMoney } from "src/utils";
+import CreateOrUpdatePaymentMethod from "./content/CreateOrUpdatePaymentMethod";
+import DeletePaymentMethods from "./content/DeletePaymentMethods";
+import { formatDate } from "src/utils";
 
-const COLUMNS: IColumn<Field>[] = [
+const COLUMNS: IColumn<PaymentMethod>[] = [
   {
     minWidth: 150,
     label: "Nombre",
@@ -16,10 +16,9 @@ const COLUMNS: IColumn<Field>[] = [
   },
   {
     minWidth: 100,
-    label: "Precio por Hora",
-    id: "price_per_hour",
+    label: "Detalle",
+    id: "detail",
     align: "right",
-    render: (item) => formatMoney(item.price_per_hour),
   },
   {
     minWidth: 100,
@@ -30,20 +29,20 @@ const COLUMNS: IColumn<Field>[] = [
   },
 ];
 
-const DEFAULT_ORDER_BY: keyof Field = "created";
+const DEFAULT_ORDER_BY: keyof PaymentMethod = "created";
 
-const ENTITY: Entity = "fields";
+const ENTITY: Entity = "payment_methods";
 
-export default function Fields() {
+export default function PaymentMethods() {
   const { actionModal, selectedItems } = useUISelector((state) => state.ui);
-  const [getFields, { data, isFetching, error }] =
-    fieldApi.useLazyGetFieldsQuery();
+  const [getPaymentMethods, { data, isFetching, error }] =
+    paymentMethodApi.useLazyGetPaymentMethodsQuery();
 
   const MODAL = {
     create: actionModal.create === ENTITY,
     update: actionModal.update === ENTITY,
     delete: actionModal.delete === ENTITY,
-    label: selectedItems.length > 1 ? "Cancha" : "Canchas",
+    label: selectedItems.length > 1 ? "Metodo de Pago" : "Metodos de Pago",
   };
 
   return (
@@ -54,11 +53,11 @@ export default function Fields() {
         isFetching={isFetching}
         columns={COLUMNS}
         defaultOrderBy={DEFAULT_ORDER_BY}
-        fetchItemsFunc={getFields}
+        fetchItemsFunc={getPaymentMethods}
         entity={ENTITY}
       />
-      <DeleteFields open={MODAL.delete} label={MODAL.label} />
-      <CreateOrUpdateField
+      <DeletePaymentMethods open={MODAL.delete} label={MODAL.label} />
+      <CreateOrUpdatePaymentMethod
         open={MODAL.create || MODAL.update}
         label={MODAL.label}
       />

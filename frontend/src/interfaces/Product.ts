@@ -4,6 +4,6 @@ export interface Product extends BaseItem<{}>, CreateProductReq {}
 
 export interface CreateProductReq {
   name: string;
-  stock: number | "";
-  unit_price: number | "";
+  stock: NumberOrEmpty;
+  unit_price: NumberOrEmpty;
 }

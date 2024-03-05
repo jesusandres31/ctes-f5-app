@@ -7,8 +7,8 @@ export interface Invoice
 export interface CreateInvoiceReq {
   client: string;
   data: Date;
-  total: number | "";
-  paid: number | "";
+  total: NumberOrEmpty;
+  paid: NumberOrEmpty;
 }
 
 export interface InvoiceItem
@@ -18,8 +18,8 @@ export interface InvoiceItem
 export interface CreateInvoiceItemReq {
   invoice: string;
   product: string;
-  amount: number | "";
-  unit_price: number | "";
-  total: number | "";
-  paid: number | "";
+  amount: NumberOrEmpty;
+  unit_price: NumberOrEmpty;
+  total: NumberOrEmpty;
+  paid: NumberOrEmpty;
 }
