@@ -39,7 +39,7 @@ import { DrawerSection, IMenuItem } from "src/types";
 import { useIsMobile } from "src/hooks";
 import { removeForeslash, translateTitle } from "src/constants";
 
-const DRAWER_WIDTH = 230;
+const DRAWER_WIDTH = 220;
 
 const DRAWER_SECTIONS: DrawerSection[] = [
   {
@@ -213,7 +213,7 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
                 <ListItemText
                   primary={
                     <Typography
-                      sx={{ fontSize: isNested ? 13 : 15 }}
+                      sx={{ fontSize: isNested ? "subtitle2" : "subtitle1" }}
                       variant="subtitle2"
                       color={
                         isSelected(item.to)

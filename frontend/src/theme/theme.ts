@@ -2,9 +2,11 @@ import { createTheme } from "@mui/material";
 
 const theme = createTheme({
   palette: {
-    // beerboard
     primary: {
-      main: "#e26544",
+      main: "#f37a48",
+      // e26544 beerboard
+      // f37a48 mandarin orange
+      // 0072bb french deep blue
     },
     secondary: {
       main: "#f6a92c",
@@ -61,13 +63,20 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: ["Inter", "sans-serif"].join(","),
-    fontSize: 13.5,
+    fontSize: 13,
   },
   components: {
     MuiIconButton: {
       styleOverrides: {
         root: {
           color: "text.secondary",
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        contained: {
+          color: "white",
         },
       },
     },

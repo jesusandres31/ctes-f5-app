@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useCallback } from "react";
 import {
   Grid,
   Toolbar,
@@ -10,6 +10,7 @@ import {
   InputLabel,
   OutlinedInput,
   InputAdornment,
+  debounce,
 } from "@mui/material";
 import {
   AddRounded,
@@ -18,31 +19,57 @@ import {
   SearchRounded,
   ClearRounded,
 } from "@mui/icons-material";
-import { openModal, useUISelector } from "src/slices/ui/uiSlice";
-import { CustomButton, CustomIconButton } from "./utils";
-import { Entity } from "src/types";
+import { openModal, setFilter, useUISelector } from "src/slices/ui/uiSlice";
+import { CustomButton, CustomIconButton } from "./common/utils";
+import { Entity, Order } from "src/types";
 import { useAppDispatch } from "src/app/store";
+import { useIsMobile } from "src/hooks";
 
 interface TableToolbarProps {
-  selectedItems: string[];
-  isMobile: boolean;
-  onClickClear: () => void;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleFetchItems: (
+    page: number,
+    perPage: number,
+    filter: string,
+    order: Order,
+    orderBy: string
+  ) => Promise<void>;
   entity: Entity;
 }
 
 export default function TableToolbar({
-  selectedItems,
-  isMobile,
-  onClickClear,
-  onChange,
+  handleFetchItems,
   entity,
 }: TableToolbarProps) {
   const theme = useTheme();
   const dispatch = useAppDispatch();
+  const { selectedItems, filter, order, orderBy, page, perPage } =
+    useUISelector((state) => state.ui);
   const isSomeSelected = selectedItems.length > 0;
   const isOneSelected = selectedItems.length === 1;
-  const { filter } = useUISelector((state) => state.ui);
+  const { isMobile } = useIsMobile();
+
+  const debounceFetchItems = useCallback(
+    debounce(async (filter: string) => {
+      handleFetchItems(page, perPage, filter, order, orderBy);
+    }, 300),
+    []
+  );
+
+  const handleSetFilter = async (filter: string) => {
+    dispatch(setFilter(filter));
+    debounceFetchItems(filter);
+  };
+
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    const filter = e.currentTarget.value;
+    handleSetFilter(filter);
+  };
+
+  const handleClickClear = () => {
+    if (filter) {
+      handleSetFilter("");
+    }
+  };
 
   return (
     <Toolbar
@@ -96,7 +123,7 @@ export default function TableToolbar({
                   <InputLabel>Search</InputLabel>
                   <OutlinedInput
                     value={filter}
-                    onChange={onChange}
+                    onChange={handleSearch}
                     startAdornment={
                       <InputAdornment
                         position="start"
@@ -107,7 +134,7 @@ export default function TableToolbar({
                     }
                     endAdornment={
                       <InputAdornment position="end">
-                        <IconButton edge="end" onClick={onClickClear}>
+                        <IconButton edge="end" onClick={handleClickClear}>
                           <ClearRounded />
                         </IconButton>
                       </InputAdornment>

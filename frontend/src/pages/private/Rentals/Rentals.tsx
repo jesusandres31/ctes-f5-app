@@ -24,6 +24,13 @@ const COLUMNS: IColumn<Rental>[] = [
   },
   {
     minWidth: 100,
+    label: "Pelota",
+    id: "ball",
+    align: "right",
+    render: (item) => item.expand.ball.name,
+  },
+  {
+    minWidth: 100,
     label: "Horas",
     id: "hours_amount",
     align: "right",
