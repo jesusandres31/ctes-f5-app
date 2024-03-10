@@ -6,6 +6,7 @@ import {
   Button,
   Grid,
   TextField,
+  Typography,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { Input } from "src/types";
@@ -48,13 +49,13 @@ export default function CreateOrUpdateModal({
       scroll="paper"
       maxWidth={maxWidth}
     >
-      <DialogTitle>{`${
-        isUpdate ? "Actualizar" : "Crear nuevo"
-      } ${label}`}</DialogTitle>
+      <DialogTitle>
+        {`${isUpdate ? "Actualizar" : "Crear nuevo"} ${label}`}
+      </DialogTitle>
       <DialogContent
         dividers
         sx={{
-          p: 3,
+          pt: 4,
         }}
       >
         <Grid container spacing={2} columns={columns} direction={direction}>
@@ -93,6 +94,7 @@ export default function CreateOrUpdateModal({
                   error={!!input.error}
                   helperText={input.error ? input.error : " "}
                   variant="outlined"
+                  size="small"
                   inputProps={{
                     max: input.max,
                     min: input.min,
@@ -106,7 +108,7 @@ export default function CreateOrUpdateModal({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button variant="outlined" onClick={handleClose}>
+        <Button variant="outlined" color="secondary" onClick={handleClose}>
           Cancelar
         </Button>
         <LoadingButton

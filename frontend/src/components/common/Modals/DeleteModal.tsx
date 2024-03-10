@@ -44,7 +44,7 @@ export default function DeleteModal({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button variant="outlined" onClick={handleClose}>
+        <Button variant="outlined" color="secondary" onClick={handleClose}>
           Cancelar
         </Button>
         <LoadingButton

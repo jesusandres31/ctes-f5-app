@@ -15,7 +15,6 @@ import {
   Box,
   AppBar,
   useTheme,
-  darken,
   ListSubheader,
   Grid,
   Collapse,
@@ -124,7 +123,7 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
   const { handleGoTo, route } = useRouter();
   const theme = useTheme();
   const isSelected = (path?: string) => route === path;
-  const backgroundColor = darken(theme.palette.background.default, 0.08);
+  const backgroundColor = "darken(theme.palette.background.default, 0.08)";
   const borderRadius = 8;
 
   return (
@@ -199,10 +198,10 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
                     <ListItemIcon
                       sx={{
                         minWidth: "40px",
-                        // color: isSelected(item.to)
-                        //   ? theme.palette.primary.main
-                        //   : lighten(theme.palette.text.secondary, 0.2),
-                        color: theme.palette.primary.main,
+                        color: "secondary.light",
+                        /* color: isSelected(item.to)
+                          ? theme.palette.primary.main
+                          : "secondary.light", */
                       }}
                     >
                       {item.icon}
@@ -210,15 +209,19 @@ const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
                   </Box>
                 )}
 
+                {/* <Typography variant="body2" fontWeight="bold">
+                  {column.label}
+                </Typography> */}
+
                 <ListItemText
                   primary={
                     <Typography
-                      sx={{ fontSize: isNested ? "subtitle2" : "subtitle1" }}
-                      variant="subtitle2"
+                      sx={{ fontSize: isNested ? 12 : 13 }}
+                      fontWeight={isSelected(item.to) ? "bold" : ""}
                       color={
                         isSelected(item.to)
                           ? theme.palette.primary.main
-                          : "text.secondary"
+                          : "text.primary"
                       }
                     >
                       {item.text || translateTitle(removeForeslash(item.to))}
@@ -256,11 +259,12 @@ const CustomDrawer = () => {
   /* const theme = useTheme(); */
 
   return (
-    <div>
+    <Box sx={{ overflow: "hidden" }}>
       <Toolbar
+        variant="dense"
         sx={{
-          /* backgroundColor: theme.palette.primary.main */ backgroundColor:
-            "text.primary",
+          // backgroundColor: "text.primary",
+          backgroundColor: "secondary.main",
         }}
       >
         {/* <SportsSoccerRounded sx={{ color: "background.default" }} /> */}
@@ -268,15 +272,18 @@ const CustomDrawer = () => {
           {`\xa0Ctes F5 v${version}`}
         </Typography>
       </Toolbar>
-      {DRAWER_SECTIONS.map((section, index) => (
-        <React.Fragment key={section.title}>
-          <Box px={1} pt={1}>
-            <CustomList items={section.menuItems} subheader={section.title} />
-          </Box>
-          {index < DRAWER_SECTIONS.length - 1 && <Divider variant="middle" />}
-        </React.Fragment>
-      ))}
-    </div>
+
+      <Box sx={{ overflow: "auto", height: "100%" }}>
+        {DRAWER_SECTIONS.map((section, index) => (
+          <React.Fragment key={section.title}>
+            <Box px={1} pt={1}>
+              <CustomList items={section.menuItems} subheader={section.title} />
+            </Box>
+            {index < DRAWER_SECTIONS.length - 1 && <Divider variant="middle" />}
+          </React.Fragment>
+        ))}
+      </Box>
+    </Box>
   );
 };
 
@@ -299,10 +306,11 @@ export default function Dashboard() {
           boxShadow: 0,
           width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
           ml: { sm: `${DRAWER_WIDTH}px` },
-          backgroundColor: "text.primary",
+          // backgroundColor: "text.primary",
+          backgroundColor: "secondary.main",
         }}
       >
-        <Toolbar>
+        <Toolbar variant="dense">
           <Grid
             container
             direction="row"
@@ -315,13 +323,22 @@ export default function Dashboard() {
                 aria-label="open drawer"
                 edge="start"
                 onClick={handleDrawerToggle}
-                sx={{ mr: 2, display: { sm: "none" } }}
+                sx={{
+                  mr: 2,
+                  display: { sm: "none" },
+                  color: "white",
+                }}
               >
                 <MenuRounded />
               </IconButton>
             </Grid>
             <Grid item>
-              <Typography variant="h6" noWrap component="div">
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{ color: "white" }}
+              >
                 {translateTitle(route)}
               </Typography>
             </Grid>
@@ -331,7 +348,7 @@ export default function Dashboard() {
             direction="row"
             justifyContent="flex-end"
             alignItems="center"
-            sx={{ width: 50 }}
+            sx={{ width: 50, color: "white" }}
           >
             <LoginButton />
           </Grid>
@@ -386,10 +403,12 @@ export default function Dashboard() {
           width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
         }}
       >
-        <Toolbar />
+        <Toolbar variant="dense" />
         <Box
           sx={{
-            height: isMobile ? "90%" : { sm: `calc(100% - 60px)` },
+            height: isMobile
+              ? "90%"
+              : { sm: `calc(100% - 60px)`, md: `calc(100% - 50px)` },
           }}
         >
           <Outlet />

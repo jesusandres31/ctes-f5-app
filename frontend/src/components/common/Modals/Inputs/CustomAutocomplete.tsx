@@ -131,6 +131,7 @@ export default function CustomAutocomplete({
           error={!!input.error}
           helperText={input.error ? input.error : " "}
           sx={{ width: STYLE.width.textfield }}
+          size="small"
           InputProps={{
             ...params.InputProps,
             endAdornment: (

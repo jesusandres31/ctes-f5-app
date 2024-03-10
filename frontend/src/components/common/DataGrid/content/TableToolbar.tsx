@@ -18,6 +18,7 @@ import {
   DeleteForeverRounded,
   SearchRounded,
   ClearRounded,
+  MenuRounded,
 } from "@mui/icons-material";
 import { openModal, setFilter, useUISelector } from "src/slices/ui/uiSlice";
 import { CustomButton, CustomIconButton } from "./common/utils";

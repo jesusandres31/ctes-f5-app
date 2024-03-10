@@ -4,6 +4,8 @@ import {
   Checkbox,
   Tooltip,
   IconButton,
+  useTheme,
+  lighten,
 } from "@mui/material";
 import { IColumn, Item } from "src/types";
 import { formatNulls } from "src/utils";
@@ -38,6 +40,8 @@ export default function rowContent(
   handleCollapse: (id: string) => void,
   isCollapsible: boolean = true // TODO: make this dynimic
 ) {
+  const theme = useTheme();
+
   return (
     <>
       <TableCell padding="checkbox" sx={{ cursor: "pointer" }}>
@@ -55,7 +59,7 @@ export default function rowContent(
 
         return (
           <TableCell
-            height={55}
+            height={50}
             component="th"
             scope="row"
             size="small"
@@ -68,7 +72,7 @@ export default function rowContent(
               <Typography
                 variant="subtitle2"
                 noWrap
-                color="text.secondary"
+                color={lighten(theme.palette.text.primary, 0.2)}
                 sx={{
                   overflow: "hidden",
                   textOverflow: "ellipsis",

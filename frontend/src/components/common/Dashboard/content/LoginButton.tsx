@@ -77,15 +77,8 @@ export default function LoginButton() {
         onClose={handleClose}
       >
         {ITEMS.map((item) => (
-          <MenuItem
-            key={item.to}
-            onClick={item.onClick}
-            component={Link}
-            to={item.to}
-          >
-            <ListItemIcon
-              sx={{ minWidth: "40px", color: theme.palette.primary.light }}
-            >
+          <MenuItem key={item.to} onClick={item.onClick}>
+            <ListItemIcon sx={{ minWidth: "40px", color: "secondary.light" }}>
               {item.icon}
             </ListItemIcon>
             <Typography variant="subtitle2">{item.text}</Typography>

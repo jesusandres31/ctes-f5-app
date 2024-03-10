@@ -70,7 +70,9 @@ export default function fixedHeaderContent(
 
   return (
     <TableRow
-      sx={{ backgroundColor: lighten(theme.palette.text.secondary, 0.9) }}
+      sx={{
+        backgroundColor: theme.palette.background.default,
+      }}
     >
       <TableCell padding="checkbox">
         <Checkbox

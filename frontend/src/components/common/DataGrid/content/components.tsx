@@ -55,13 +55,14 @@ function TableRowComponent({
   ...props
 }: TableRowComponentProps) {
   const { selectedItems, collapseItem } = useUISelector((state) => state.ui);
+  const selected = isSelected(selectedItems, _item.id);
 
   return (
     <React.Fragment>
       <TableRow
-        selected={isSelected(selectedItems, _item.id)}
+        selected={selected}
         sx={{
-          "& > *": { borderBottom: "unset" },
+          "& > *": { borderBottom: selected ? "0px" : "unset" },
         }}
         {...props}
       />

@@ -13,3 +13,7 @@ revisar todas las input validations
 crud transaction and cascade. pb_hooks. logical delete
 
 collapse (rentals invoices)
+
+borderbottom en row
+
+scroll en row cuando primero esta collapse
