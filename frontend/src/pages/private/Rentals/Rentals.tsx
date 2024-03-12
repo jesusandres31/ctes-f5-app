@@ -71,7 +71,7 @@ export default function Rentals() {
     create: actionModal.create === ENTITY,
     update: actionModal.update === ENTITY,
     delete: actionModal.delete === ENTITY,
-    label: selectedItems.length > 1 ? "ALquileres" : "Alquier",
+    label: selectedItems.length > 1 ? "Alquileres" : "Alquier",
   };
 
   return (

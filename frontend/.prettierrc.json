@@ -7,6 +7,7 @@
     "arrowParens": "avoid",
     "tabWidth": 2,
     "semi": true,
-    "endOfLine": "auto"
+    "endOfLine": "auto",
+    "importOrder": ["^\\u0000", "^@?\\w", "^[^.]"]
   }
 }

@@ -25,7 +25,7 @@ export default function DeleteModal({
 }: DeleteModalProps) {
   const dispatch = useAppDispatch();
   const { selectedItems } = useUISelector((state) => state.ui);
-  const few = selectedItems.length > 1;
+  const isMoreThanOne = selectedItems.length > 1;
 
   const handleClose = () => dispatch(closeModal());
 
@@ -39,8 +39,8 @@ export default function DeleteModal({
       <DialogTitle>{`Eliminar ${label}`}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          {`Si eliminas ${few ? "los siguientes" : "el siguiente"} 
-          item${few ? "s" : ""}, no podrás recuperarlo.`}
+          {`Si eliminas ${isMoreThanOne ? "los siguientes" : "el siguiente"} 
+          item${isMoreThanOne ? "s" : ""}, no podrás recuperarlo.`}
         </DialogContentText>
       </DialogContent>
       <DialogActions>

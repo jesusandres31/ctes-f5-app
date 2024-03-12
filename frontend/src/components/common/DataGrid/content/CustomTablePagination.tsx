@@ -1,15 +1,17 @@
 import React from "react";
-import { Divider, Grid, TablePagination as Pagination } from "@mui/material";
+import { Divider, Grid, TablePagination } from "@mui/material";
 import { Item } from "src/types";
 import { setPage } from "src/slices/ui/uiSlice";
 import { useAppDispatch } from "src/app/store";
 import { ListResult } from "pocketbase";
 
-interface TablePaginationProps {
+interface CustomTablePaginationProps {
   data: ListResult<Item> | undefined;
 }
 
-export default function TablePagination({ data }: TablePaginationProps) {
+export default function CustomTablePagination({
+  data,
+}: CustomTablePaginationProps) {
   const dispatch = useAppDispatch();
 
   const handleChangePage = (
@@ -23,7 +25,7 @@ export default function TablePagination({ data }: TablePaginationProps) {
   return (
     <Grid container justifyContent="center" flexDirection="column">
       <Divider />
-      <Pagination
+      <TablePagination
         component="div"
         rowsPerPageOptions={[data?.perPage || 0]}
         count={data?.totalItems || 0}

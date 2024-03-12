@@ -18,15 +18,14 @@ import {
   DeleteForeverRounded,
   SearchRounded,
   ClearRounded,
-  MenuRounded,
 } from "@mui/icons-material";
 import { openModal, setFilter, useUISelector } from "src/slices/ui/uiSlice";
-import { CustomButton, CustomIconButton } from "./common/utils";
+import { CustomButton, CustomIconButton } from "./utils";
 import { Entity, Order } from "src/types";
 import { useAppDispatch } from "src/app/store";
 import { useIsMobile } from "src/hooks";
 
-interface TableToolbarProps {
+interface CustomTableToolbarProps {
   handleFetchItems: (
     page: number,
     perPage: number,
@@ -37,10 +36,10 @@ interface TableToolbarProps {
   entity: Entity;
 }
 
-export default function TableToolbar({
+export default function CustomTableToolbar({
   handleFetchItems,
   entity,
-}: TableToolbarProps) {
+}: CustomTableToolbarProps) {
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const { selectedItems, filter, order, orderBy, page, perPage } =

@@ -2,18 +2,14 @@
 
 -
 
-borar msg label: selectedItems.length > 1 ? "Pelotas" : "Pelota",
-
 reestrucutrar las cosas de conf. apitags, consts, app, types
 
 revisar todas las input validations
 
--
-
 crud transaction and cascade. pb_hooks. logical delete
 
-collapse (rentals invoices)
+collapse data (rentals, invoices)
 
-borderbottom en row
+change drawer
 
-scroll en row cuando primero esta collapse
+mobile responsive
