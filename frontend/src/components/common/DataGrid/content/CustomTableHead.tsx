@@ -5,7 +5,7 @@ import {
   Checkbox,
   TableSortLabel,
   useTheme,
-  TableHead as Header,
+  TableHead,
 } from "@mui/material";
 import { Column, Item, Order } from "src/types";
 import { useIsMobile } from "src/hooks";
@@ -18,21 +18,6 @@ import {
 } from "src/slices/ui/uiSlice";
 import { useAppDispatch } from "src/app/store";
 
-const styles = {
-  sticky: {
-    position: "sticky",
-    paddingBlock: 0,
-  },
-  stickyMobile: {
-    position: "sticky",
-    paddingBlock: 0,
-    backgroundColor: "background.paper",
-    right: 0,
-    padding: 0,
-    margin: 0,
-  },
-};
-
 interface CustomTableHeadProps {
   columns: Column;
   items: Item[];
@@ -43,12 +28,14 @@ interface CustomTableHeadProps {
     order: Order,
     orderBy: string
   ) => Promise<void>;
+  styles: any;
 }
 
 export default function CustomTableHead({
   columns,
   items,
   handleFetchItems,
+  styles,
 }: CustomTableHeadProps) {
   const dispatch = useAppDispatch();
   const { selectedItems, filter, order, orderBy, page, perPage } =
@@ -74,7 +61,7 @@ export default function CustomTableHead({
   };
 
   return (
-    <Header>
+    <TableHead>
       <TableRow
         sx={{
           backgroundColor: theme.palette.background.default,
@@ -87,9 +74,6 @@ export default function CustomTableHead({
             checked={(items && items.length > 0 && isAllSelected) ?? false}
             indeterminate={selectedItems.length > 0 && !isAllSelected}
             onChange={handleSelectAll}
-            inputProps={{
-              "aria-label": "select all desserts",
-            }}
           />
         </TableCell>
 
@@ -118,6 +102,6 @@ export default function CustomTableHead({
           sx={isMobile ? styles.stickyMobile : styles.sticky}
         />
       </TableRow>
-    </Header>
+    </TableHead>
   );
 }

@@ -10,6 +10,4 @@ crud transaction and cascade. pb_hooks. logical delete
 
 collapse data (rentals, invoices)
 
-change drawer
-
-mobile responsive
+save in localstorage if drawer is open or closed

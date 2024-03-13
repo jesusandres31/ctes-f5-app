@@ -401,6 +401,7 @@ export default function Dashboard() {
           flexGrow: 1,
           p: 3,
           width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+          overflow: "hidden",
         }}
       >
         <Toolbar variant="dense" />

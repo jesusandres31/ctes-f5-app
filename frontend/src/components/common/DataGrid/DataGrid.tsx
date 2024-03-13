@@ -22,6 +22,20 @@ import CustomTableHead from "./content/CustomTableHead";
 import CustomTablePagination from "./content/CustomTablePagination";
 import CustomTableBody from "./content/CustomTableBody";
 
+const styles = {
+  sticky: {
+    position: "sticky",
+    paddingBlock: 0,
+  },
+  stickyMobile: {
+    position: "sticky",
+    paddingBlock: 0,
+    right: 0,
+    padding: 0,
+    margin: 0,
+  },
+};
+
 interface DataGridProps {
   data: ListResult<Item> | undefined;
   error: FetchBaseQueryError | SerializedError | undefined;
@@ -97,11 +111,13 @@ export default function DataGrid({
               columns={columns}
               items={data?.items}
               handleFetchItems={handleFetchItems}
+              styles={styles}
             />
             <CustomTableBody
               items={data.items}
               columns={columns}
               isCollapsible={isCollapsible}
+              styles={styles}
             />
           </Table>
         </TableContainer>

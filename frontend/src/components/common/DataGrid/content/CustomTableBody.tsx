@@ -28,30 +28,18 @@ import React from "react";
 import { TableRow } from "@mui/material";
 import { TableBody, Table, Box, Collapse } from "@mui/material";
 
-const styles = {
-  sticky: {
-    position: "sticky",
-    paddingBlock: 0,
-  },
-  stickyMobile: {
-    /* position: "sticky",
-    paddingBlock: 0,
-    right: 0,
-    padding: 0,
-    margin: 0, */
-  },
-};
-
 interface CustomTableBodyProps {
   items: Item[];
   columns: Column;
   isCollapsible: boolean;
+  styles: any;
 }
 
 export default function CustomTableBody({
   items,
   columns,
   isCollapsible,
+  styles,
 }: CustomTableBodyProps) {
   const dispatch = useAppDispatch();
   const { selectedItems, collapseItem } = useUISelector((state) => state.ui);

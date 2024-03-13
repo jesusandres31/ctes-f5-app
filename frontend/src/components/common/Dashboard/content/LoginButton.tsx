@@ -1,12 +1,10 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import {
   Typography,
   ListItemIcon,
   Menu,
   MenuItem,
   IconButton,
-  useTheme,
 } from "@mui/material";
 import {
   AccountCircleRounded,
@@ -20,7 +18,6 @@ import { IMenuItem } from "src/types";
 export default function LoginButton() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const theme = useTheme();
   const { handleSignOut } = useAuth();
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {
