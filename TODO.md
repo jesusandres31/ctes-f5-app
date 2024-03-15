@@ -10,4 +10,4 @@ crud transaction and cascade. pb_hooks. logical delete
 
 collapse data (rentals, invoices)
 
-save in localstorage if drawer is open or closed
+prefix cuando selecciono un colapse. eliminar old colapse
