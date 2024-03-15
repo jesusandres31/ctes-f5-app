@@ -74,7 +74,7 @@ export interface IMenuItem {
 }
 
 export interface DrawerSection {
-  title: string;
+  title?: string;
   menuItems: IMenuItem[];
 }
 

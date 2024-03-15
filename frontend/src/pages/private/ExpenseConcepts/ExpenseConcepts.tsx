@@ -5,7 +5,7 @@ import { expenseConceptApi } from "src/app/services/expenseConceptService";
 import { useUISelector } from "src/slices/ui/uiSlice";
 import CreateOrUpdateExpenseConcept from "./content/CreateOrUpdateExpenseConcept";
 import DeleteExpenseConcepts from "./content/DeleteExpenseConcepts";
-import { formatDate, formatMoney } from "src/utils";
+import { formatDate, formatMoney } from "src/utils/format";
 
 const COLUMNS: IColumn<ExpenseConcept>[] = [
   {

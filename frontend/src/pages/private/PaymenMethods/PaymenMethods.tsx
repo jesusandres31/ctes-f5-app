@@ -5,7 +5,7 @@ import { paymentMethodApi } from "src/app/services/paymentMethodService";
 import { useUISelector } from "src/slices/ui/uiSlice";
 import CreateOrUpdatePaymentMethod from "./content/CreateOrUpdatePaymentMethod";
 import DeletePaymentMethods from "./content/DeletePaymentMethods";
-import { formatDate } from "src/utils";
+import { formatDate } from "src/utils/format";
 
 const COLUMNS: IColumn<PaymentMethod>[] = [
   {

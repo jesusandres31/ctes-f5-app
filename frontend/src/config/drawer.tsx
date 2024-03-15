@@ -12,7 +12,7 @@ import { DrawerSection } from "src/types";
 
 export const DRAWER_SECTIONS: DrawerSection[] = [
   {
-    title: "Menu",
+    // title: "Menu",
     menuItems: [
       {
         icon: <LocalActivityRounded />,
@@ -37,12 +37,11 @@ export const DRAWER_SECTIONS: DrawerSection[] = [
     ],
   },
   {
-    title: "Config",
+    // title: "Config",
     menuItems: [
       {
         text: "Administrar",
         icon: <ConstructionRounded />,
-        to: "",
         nestedItems: [
           {
             to: AppRoutes.Balls,
@@ -61,12 +60,11 @@ export const DRAWER_SECTIONS: DrawerSection[] = [
     ],
   },
   {
-    title: "Reportes",
+    // title: "Reportes",
     menuItems: [
       {
         text: "Estadisticas",
         icon: <DataSaverOffRounded />,
-        to: "",
         nestedItems: [
           {
             to: AppRoutes.StatsIncomes,

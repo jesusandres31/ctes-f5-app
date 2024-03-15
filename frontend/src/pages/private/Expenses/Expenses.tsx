@@ -2,7 +2,7 @@ import { Expense } from "src/interfaces";
 import { Entity, IColumn } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
 import { expenseApi } from "src/app/services/expenseService";
-import { formatDate, formatMoney } from "src/utils";
+import { formatDate, formatMoney } from "src/utils/format";
 import { useUISelector } from "src/slices/ui/uiSlice";
 import DeleteExpenses from "./content/DeleteExpenses";
 import CreateOrUpdateExpense from "./content/CreateOrUpdateExpense";

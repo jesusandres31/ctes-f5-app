@@ -5,7 +5,7 @@ import { ballApi } from "src/app/services/ballService";
 import { useUISelector } from "src/slices/ui/uiSlice";
 import CreateOrUpdateBall from "./content/CreateOrUpdateBall";
 import DeleteBalls from "./content/DeleteBalls";
-import { formatDate } from "src/utils";
+import { formatDate } from "src/utils/format";
 
 const COLUMNS: IColumn<Ball>[] = [
   {

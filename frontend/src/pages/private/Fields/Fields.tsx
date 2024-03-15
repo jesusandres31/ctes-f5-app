@@ -5,7 +5,7 @@ import { fieldApi } from "src/app/services/fieldService";
 import { useUISelector } from "src/slices/ui/uiSlice";
 import CreateOrUpdateField from "./content/CreateOrUpdateField";
 import DeleteFields from "./content/DeleteFields";
-import { formatDate, formatMoney } from "src/utils";
+import { formatDate, formatMoney } from "src/utils/format";
 
 const COLUMNS: IColumn<Field>[] = [
   {

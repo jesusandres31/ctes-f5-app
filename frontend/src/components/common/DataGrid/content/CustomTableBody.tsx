@@ -19,7 +19,7 @@ import {
   lighten,
   TableHead as Head,
 } from "@mui/material";
-import { formatNulls } from "src/utils";
+import { formatNulls } from "src/utils/format";
 import {
   KeyboardArrowDownRounded,
   KeyboardArrowUpRounded,

@@ -1,9 +1,9 @@
 import React from "react";
-import { isValidNumber } from "src/utils";
+import { isValidNumber } from "src/utils/format";
 import { NumericFormat, NumericFormatProps } from "react-number-format";
 import { capitalize } from "@mui/material";
 import { FormikProps } from "formik";
-import { removeExtraSpace } from "src/utils";
+import { removeExtraSpace } from "src/utils/format";
 
 interface CustomProps {
   onChange: (event: { target: { name: string; value: string } }) => void;

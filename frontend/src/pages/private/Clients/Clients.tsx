@@ -5,7 +5,7 @@ import { clientApi } from "src/app/services/clientService";
 import { useUISelector } from "src/slices/ui/uiSlice";
 import CreateOrUpdateClient from "./content/CreateOrUpdateClient";
 import DeleteClients from "./content/DeleteClients";
-import { formatDate } from "src/utils";
+import { formatDate } from "src/utils/format";
 
 const COLUMNS: IColumn<Client>[] = [
   {

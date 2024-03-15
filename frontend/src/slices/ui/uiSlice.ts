@@ -4,6 +4,7 @@ import { AlertColor } from "@mui/material";
 import { RootState } from "src/app/store";
 import { Action, Entity, Order } from "src/types";
 import { PAGE } from "src/constants";
+import { drawer } from "src/utils/drawer";
 
 interface ISnackbar {
   message: string;
@@ -32,7 +33,7 @@ interface IUIState {
 }
 
 export const uiInitialState: IUIState = {
-  openDrawer: false,
+  openDrawer: drawer.get(),
   collapseItem: "",
   navbar: null,
   snackbar: {
@@ -67,6 +68,7 @@ const ui = createSlice({
   reducers: {
     toggleOpenDrawer(state: IUIState) {
       state.openDrawer = !state.openDrawer;
+      drawer.set(!state.openDrawer);
     },
     setCollapse(state: IUIState, { payload }: PayloadAction<string>) {
       state.collapseItem = payload;

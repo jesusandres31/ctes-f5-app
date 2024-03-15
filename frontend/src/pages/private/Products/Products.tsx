@@ -5,7 +5,7 @@ import { productApi } from "src/app/services/productService";
 import { useUISelector } from "src/slices/ui/uiSlice";
 import CreateOrUpdateProduct from "./content/CreateOrUpdateProduct";
 import DeleteProducts from "./content/DeleteProducts";
-import { formatDate, formatMoney } from "src/utils";
+import { formatDate, formatMoney } from "src/utils/format";
 
 const COLUMNS: IColumn<Product>[] = [
   {

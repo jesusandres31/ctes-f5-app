@@ -1,8 +1,6 @@
 import { VLDN } from "./FormUtils";
 
-/**
- * dates
- */
+// dates
 export const formatDate = (str: Date) => {
   const date = new Date(str);
   const day = date.getDate().toString().padStart(2, "0");
@@ -11,9 +9,7 @@ export const formatDate = (str: Date) => {
   return `${day}/${month}/${year}`;
 };
 
-/**
- * string formats
- */
+// string formats
 export const removeSpace = (str: string) => {
   str = str.replace(" ", "");
   return str;
@@ -48,9 +44,7 @@ export const formatMoney = (num: NumberOrEmpty) => {
   return formattedPrice;
 };
 
-/**
- * validation
- */
+// validation
 export const isValidNumber = (value: number | undefined): boolean => {
   return (
     value !== undefined &&

@@ -2,7 +2,7 @@ import { Rental } from "src/interfaces";
 import { Entity, IColumn } from "src/types";
 import DataGrid from "src/components/common/DataGrid/DataGrid";
 import { rentalApi } from "src/app/services/rentalService";
-import { formatDate, formatMoney } from "src/utils";
+import { formatDate, formatMoney } from "src/utils/format";
 import { useUISelector } from "src/slices/ui/uiSlice";
 import DeleteRentals from "./content/DeleteRentals";
 import CreateOrUpdateRental from "./content/CreateOrUpdateRental";

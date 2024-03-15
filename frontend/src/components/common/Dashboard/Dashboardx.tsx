@@ -47,9 +47,9 @@ const closedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
+  width: `calc(${theme.spacing(8)} + 1px)`,
   [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
+    width: `calc(${theme.spacing(9)} + 1px)`,
   },
 });
 
@@ -107,23 +107,34 @@ const DrawerContent = () => {
 
   return (
     <Box sx={{ overflow: "hidden" }}>
-      <Toolbar variant="dense" />
-      <DrawerHeader>
-        <IconButton onClick={() => dispatch(toggleOpenDrawer())}>
-          {theme.direction === "rtl" ? (
-            <ChevronRightRounded />
-          ) : (
-            <ChevronLeftRounded />
-          )}
-        </IconButton>
+      {/* <Toolbar variant="dense" /> */}
+      <DrawerHeader sx={{ marginBlock: -1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            width: "100%",
+            cursor: "pointer",
+          }}
+          onClick={() => dispatch(toggleOpenDrawer())}
+        >
+          <IconButton>
+            {theme.direction === "rtl" ? (
+              <ChevronRightRounded />
+            ) : (
+              <ChevronLeftRounded />
+            )}
+          </IconButton>
+        </Box>
       </DrawerHeader>
       <Box sx={{ overflow: "auto", height: "100%" }}>
         {DRAWER_SECTIONS.map((section, index) => (
-          <React.Fragment key={section.title}>
+          <React.Fragment key={`${index}-${section.title}`}>
+            <Divider variant="middle" />
             <Box px={1} pt={1}>
               <CustomList items={section.menuItems} subheader={section.title} />
             </Box>
-            {index < DRAWER_SECTIONS.length - 1 && <Divider variant="middle" />}
+            {/* {index < DRAWER_SECTIONS.length - 1 && <Divider variant="middle" />} */}
           </React.Fragment>
         ))}
       </Box>
@@ -136,6 +147,7 @@ export default function Dashboard() {
   const { route } = useRouter();
   const { openDrawer } = useUISelector((state) => state.ui);
   const dispatch = useAppDispatch();
+  const notMobAndOpen = !isMobile && openDrawer;
 
   return (
     <Box sx={{ height: "100vh", display: "flex" }}>
@@ -143,6 +155,7 @@ export default function Dashboard() {
 
       <AppBar
         position="fixed"
+        open={notMobAndOpen}
         sx={{
           boxShadow: 0,
           /* width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
@@ -164,8 +177,12 @@ export default function Dashboard() {
                 edge="start"
                 onClick={() => dispatch(toggleOpenDrawer())}
                 sx={{
-                  mr: 2,
-                  display: { sm: "none" },
+                  ...(notMobAndOpen
+                    ? { display: "none" }
+                    : {
+                        mr: 5.5,
+                        pl: 1.5,
+                      }),
                   color: "white",
                 }}
               >
@@ -177,7 +194,10 @@ export default function Dashboard() {
                 variant="h6"
                 noWrap
                 component="div"
-                sx={{ color: "white" }}
+                sx={{
+                  color: "white",
+                  ...(notMobAndOpen && { paddingLeft: 1 }),
+                }}
               >
                 {translateTitle(route)}
               </Typography>

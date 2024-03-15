@@ -9,7 +9,9 @@ export const URL = {
 export const version = packageJson.version;
 
 // application keys
-export const key = {};
+export const key = {
+  DRAWER: "drawer",
+};
 
 // application routing
 export enum AppRoutes {
@@ -35,7 +37,7 @@ export enum AppRoutes {
 
 // general config
 export const conf = {
-  LANDING_PAGE: AppRoutes.Sales,
+  LANDING_PAGE: AppRoutes.Rentals,
   AUTHORIZATION: "Authorization",
   TOKEN_PREFIX: "User",
 };
