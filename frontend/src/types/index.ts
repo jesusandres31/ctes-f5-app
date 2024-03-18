@@ -30,40 +30,10 @@ export interface IColumn<T> {
 
 export type Order = "asc" | "desc";
 
-// modal configuration
+/**
+ * Modal and DataGrid configuration
+ */
 export type Action = "create" | "update" | "delete";
-export type Entity =
-  | "expenses"
-  | "expense_concepts"
-  | "products"
-  | "clients"
-  | "fields"
-  | "rentals"
-  | "balls"
-  | "payment_methods";
-
-// all the app entities goes here
-export type Item =
-  | Expense
-  | ExpenseConcept
-  | Product
-  | Client
-  | Field
-  | Rental
-  | Ball
-  | PaymentMethod;
-
-// we have to create this Type due to this error message:
-// "The expected type comes from property 'columns' which is declared here on type 'IntrinsicAttributes & DataGridProps'."
-export type Column =
-  | IColumn<Expense>[]
-  | IColumn<ExpenseConcept>[]
-  | IColumn<Product>[]
-  | IColumn<Client>[]
-  | IColumn<Field>[]
-  | IColumn<Rental>[]
-  | IColumn<Ball>[]
-  | IColumn<PaymentMethod>[];
 
 export interface IMenuItem {
   text?: string;
@@ -135,3 +105,39 @@ export type FetchItemsFunc = (
     "api"
   >
 >;
+
+/**
+ * DataGrid entities
+ */
+export type Entity =
+  | "expenses"
+  | "expense_concepts"
+  | "products"
+  | "clients"
+  | "fields"
+  | "rentals"
+  | "balls"
+  | "payment_methods";
+
+// all the app entities goes here
+export type Item =
+  | Expense
+  | ExpenseConcept
+  | Product
+  | Client
+  | Field
+  | Rental
+  | Ball
+  | PaymentMethod;
+
+// we have to create this Type due to this error message:
+// "The expected type comes from property 'columns' which is declared here on type 'IntrinsicAttributes & DataGridProps'."
+export type Column =
+  | IColumn<Expense>[]
+  | IColumn<ExpenseConcept>[]
+  | IColumn<Product>[]
+  | IColumn<Client>[]
+  | IColumn<Field>[]
+  | IColumn<Rental>[]
+  | IColumn<Ball>[]
+  | IColumn<PaymentMethod>[];

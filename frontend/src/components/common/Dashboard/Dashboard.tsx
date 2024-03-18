@@ -1,285 +1,138 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Outlet } from "react-router-dom";
 import {
   Typography,
   Toolbar,
-  ListItemText,
-  ListItemIcon,
-  ListItemButton,
-  ListItem,
-  List,
   IconButton,
-  Drawer,
   Divider,
   CssBaseline,
   Box,
-  AppBar,
+  Drawer as BaseDrawer,
   useTheme,
-  ListSubheader,
   Grid,
-  Collapse,
+  CSSObject,
+  Theme,
+  styled,
 } from "@mui/material";
+import MuiDrawer from "@mui/material/Drawer";
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import {
   MenuRounded,
-  StorefrontRounded,
-  ShoppingCartRounded,
-  PeopleRounded,
-  ExpandLess,
-  ExpandMore,
-  DataSaverOffRounded,
-  LocalActivityRounded,
-  ConstructionRounded,
-  CurrencyExchangeRounded,
+  ChevronRightRounded,
+  ChevronLeftRounded,
 } from "@mui/icons-material";
-import { AppRoutes, version } from "src/config";
 import { useRouter } from "src/hooks";
+import CustomList from "./content/CustomList";
 import LoginButton from "./content/LoginButton";
-import { DrawerSection, IMenuItem } from "src/types";
 import { useIsMobile } from "src/hooks";
-import { removeForeslash, translateTitle } from "src/constants";
+import { translateTitle } from "src/utils/header";
+import { DRAWER_SECTIONS } from "src/config/drawer";
+import { toggleOpenDrawer, useUISelector } from "src/slices/ui/uiSlice";
+import { useAppDispatch } from "src/app/store";
 
 const DRAWER_WIDTH = 220;
 
-const DRAWER_SECTIONS: DrawerSection[] = [
-  {
-    title: "Menu",
-    menuItems: [
-      {
-        icon: <LocalActivityRounded />,
-        to: AppRoutes.Rentals,
-      },
-      {
-        icon: <StorefrontRounded />,
-        to: AppRoutes.Sales,
-      },
-      {
-        icon: <CurrencyExchangeRounded />,
-        to: AppRoutes.Expenses,
-      },
-      {
-        icon: <ShoppingCartRounded />,
-        to: AppRoutes.Products,
-      },
-      {
-        icon: <PeopleRounded />,
-        to: AppRoutes.Clients,
-      },
-    ],
-  },
-  {
-    title: "Config",
-    menuItems: [
-      {
-        text: "Administrar",
-        icon: <ConstructionRounded />,
-        to: "",
-        nestedItems: [
-          {
-            to: AppRoutes.Balls,
-          },
-          {
-            to: AppRoutes.Fields,
-          },
-          {
-            to: AppRoutes.ExpenseConcepts,
-          },
-          {
-            to: AppRoutes.PaymenMethods,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Reportes",
-    menuItems: [
-      {
-        text: "Estadisticas",
-        icon: <DataSaverOffRounded />,
-        to: "",
-        nestedItems: [
-          {
-            to: AppRoutes.StatsIncomes,
-          },
-          {
-            to: AppRoutes.StatsProducts,
-          },
-          {
-            to: AppRoutes.StatsClients,
-          },
-        ],
-      },
-    ],
-  },
-];
+const openedMixin = (theme: Theme): CSSObject => ({
+  width: DRAWER_WIDTH,
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  overflowX: "hidden",
+});
 
-interface CustomListProps {
-  items: IMenuItem[];
-  subheader?: string;
-  isNested?: boolean;
+const closedMixin = (theme: Theme): CSSObject => ({
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  overflowX: "hidden",
+  width: `calc(${theme.spacing(8)} + 1px)`,
+  [theme.breakpoints.up("sm")]: {
+    width: `calc(${theme.spacing(9)} + 1px)`,
+  },
+});
+
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+}));
+
+interface AppBarProps extends MuiAppBarProps {
+  open?: boolean;
 }
 
-const CustomList = ({ items, subheader, isNested }: CustomListProps) => {
-  const { handleGoTo, route } = useRouter();
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<AppBarProps>(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(["width", "margin"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    marginLeft: DRAWER_WIDTH,
+    width: `calc(100% - ${DRAWER_WIDTH}px)`,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const CustomDrawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  width: DRAWER_WIDTH,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  ...(open && {
+    ...openedMixin(theme),
+    "& .MuiDrawer-paper": openedMixin(theme),
+  }),
+  ...(!open && {
+    ...closedMixin(theme),
+    "& .MuiDrawer-paper": closedMixin(theme),
+  }),
+}));
+
+const DrawerContent = () => {
   const theme = useTheme();
-  const isSelected = (path?: string) => route === path;
-  const backgroundColor = "darken(theme.palette.background.default, 0.08)";
-  const borderRadius = 8;
-
-  return (
-    <List
-      component="div"
-      subheader={
-        <ListSubheader>
-          {subheader && (
-            <Box py={1.5}>
-              <Typography variant="subtitle2">{subheader}</Typography>
-            </Box>
-          )}
-        </ListSubheader>
-      }
-    >
-      {items.map((item, index) => {
-        const [open, setOpen] = useState(route === item.to);
-
-        useEffect(() => {
-          if (item.nestedItems) {
-            item.nestedItems.map((nestedItem) => {
-              if (route === nestedItem.to) setOpen(true);
-            });
-          }
-        }, []);
-
-        const handleCollapse = (
-          e: React.MouseEvent<HTMLDivElement, MouseEvent>
-        ) => {
-          setOpen(!open);
-          e.stopPropagation();
-        };
-
-        return (
-          <React.Fragment key={`${index}-${item.to}`}>
-            <ListItem
-              disablePadding
-              selected={isSelected(item.to)}
-              sx={{
-                pl: isNested ? 1.5 : 0,
-                height: "45px",
-                "&.Mui-selected": {
-                  // color: theme.palette.primary.main,
-                  backgroundColor /* : lighten(theme.palette.primary.light, 0.7) */,
-                  borderRadius,
-                },
-                "&:hover": {
-                  backgroundColor: item.to ? backgroundColor : "transparent",
-                  borderRadius,
-                },
-                "&.Mui-selected:hover": {
-                  backgroundColor /* : lighten(theme.palette.primary.light, 0.7) */,
-                  borderRadius,
-                },
-                /* border: isSelected(item.to)
-              ? `1px solid ${lighten(theme.palette.primary.light, 0.7)}`
-              : "none", */
-              }}
-            >
-              <ListItemButton
-                onClick={(e) => {
-                  item.to ? handleGoTo(item.to) : handleCollapse(e);
-                }}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "transparent",
-                  },
-                }}
-              >
-                {item.icon && (
-                  <Box pl={1} display="flex">
-                    <ListItemIcon
-                      sx={{
-                        minWidth: "40px",
-                        color: "secondary.light",
-                        /* color: isSelected(item.to)
-                          ? theme.palette.primary.main
-                          : "secondary.light", */
-                      }}
-                    >
-                      {item.icon}
-                    </ListItemIcon>
-                  </Box>
-                )}
-
-                {/* <Typography variant="body2" fontWeight="bold">
-                  {column.label}
-                </Typography> */}
-
-                <ListItemText
-                  primary={
-                    <Typography
-                      sx={{ fontSize: isNested ? 12 : 13 }}
-                      fontWeight={isSelected(item.to) ? "bold" : ""}
-                      color={
-                        isSelected(item.to)
-                          ? theme.palette.primary.main
-                          : "text.primary"
-                      }
-                    >
-                      {item.text || translateTitle(removeForeslash(item.to))}
-                    </Typography>
-                  }
-                />
-                {item.nestedItems && (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      color: theme.palette.text.disabled,
-                      padding: 5,
-                    }}
-                    onClick={(e) => handleCollapse(e)}
-                  >
-                    {open ? <ExpandLess /> : <ExpandMore />}
-                  </div>
-                )}
-              </ListItemButton>
-            </ListItem>
-            {item.nestedItems && (
-              <Collapse in={open} timeout="auto" unmountOnExit>
-                <CustomList items={item.nestedItems} isNested={true} />
-              </Collapse>
-            )}
-          </React.Fragment>
-        );
-      })}
-    </List>
-  );
-};
-
-const CustomDrawer = () => {
-  /* const theme = useTheme(); */
+  const dispatch = useAppDispatch();
 
   return (
     <Box sx={{ overflow: "hidden" }}>
-      <Toolbar
-        variant="dense"
-        sx={{
-          // backgroundColor: "text.primary",
-          backgroundColor: "secondary.main",
-        }}
-      >
-        {/* <SportsSoccerRounded sx={{ color: "background.default" }} /> */}
-        <Typography variant="subtitle1" color="background.paper">
-          {`\xa0Ctes F5 v${version}`}
-        </Typography>
-      </Toolbar>
-
+      <DrawerHeader sx={{ marginBlock: -1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            width: "100%",
+            cursor: "pointer",
+          }}
+          onClick={() => dispatch(toggleOpenDrawer())}
+        >
+          <IconButton>
+            {theme.direction === "rtl" ? (
+              <ChevronRightRounded />
+            ) : (
+              <ChevronLeftRounded />
+            )}
+          </IconButton>
+        </Box>
+      </DrawerHeader>
       <Box sx={{ overflow: "auto", height: "100%" }}>
         {DRAWER_SECTIONS.map((section, index) => (
-          <React.Fragment key={section.title}>
+          <React.Fragment key={`${index}-${section.title}`}>
+            <Divider variant="middle" />
             <Box px={1} pt={1}>
               <CustomList items={section.menuItems} subheader={section.title} />
             </Box>
-            {index < DRAWER_SECTIONS.length - 1 && <Divider variant="middle" />}
           </React.Fragment>
         ))}
       </Box>
@@ -288,13 +141,11 @@ const CustomDrawer = () => {
 };
 
 export default function Dashboard() {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const { isMobile } = useIsMobile();
   const { route } = useRouter();
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const { openDrawer } = useUISelector((state) => state.ui);
+  const dispatch = useAppDispatch();
+  const notMobAndOpen = !isMobile && openDrawer;
 
   return (
     <Box sx={{ height: "100vh", display: "flex" }}>
@@ -302,11 +153,9 @@ export default function Dashboard() {
 
       <AppBar
         position="fixed"
+        open={notMobAndOpen}
         sx={{
           boxShadow: 0,
-          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
-          ml: { sm: `${DRAWER_WIDTH}px` },
-          // backgroundColor: "text.primary",
           backgroundColor: "secondary.main",
         }}
       >
@@ -322,10 +171,14 @@ export default function Dashboard() {
                 color="inherit"
                 aria-label="open drawer"
                 edge="start"
-                onClick={handleDrawerToggle}
+                onClick={() => dispatch(toggleOpenDrawer())}
                 sx={{
-                  mr: 2,
-                  display: { sm: "none" },
+                  ...(notMobAndOpen
+                    ? { display: "none" }
+                    : {
+                        mr: 5.5,
+                        pl: 1.5,
+                      }),
                   color: "white",
                 }}
               >
@@ -337,7 +190,10 @@ export default function Dashboard() {
                 variant="h6"
                 noWrap
                 component="div"
-                sx={{ color: "white" }}
+                sx={{
+                  color: "white",
+                  ...(notMobAndOpen && { paddingLeft: 1 }),
+                }}
               >
                 {translateTitle(route)}
               </Typography>
@@ -354,56 +210,34 @@ export default function Dashboard() {
           </Grid>
         </Toolbar>
       </AppBar>
-      <Box
-        component="nav"
-        sx={{
-          width: { sm: DRAWER_WIDTH },
-          flexShrink: { sm: 0 },
-        }}
-        aria-label="mailbox folders"
-      >
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: DRAWER_WIDTH,
-            },
-          }}
-        >
-          <CustomDrawer />
-        </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: DRAWER_WIDTH,
-            },
-          }}
-          open
-        >
-          <CustomDrawer />
-        </Drawer>
+      <Box component="nav">
+        {isMobile ? (
+          <BaseDrawer
+            variant="temporary"
+            open={openDrawer}
+            onClose={() => dispatch(toggleOpenDrawer())}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
+            sx={{
+              display: { xs: "block", sm: "none" },
+            }}
+          >
+            <DrawerContent />
+          </BaseDrawer>
+        ) : (
+          <CustomDrawer
+            variant="permanent"
+            sx={{
+              display: { xs: "none", sm: "block" },
+            }}
+            open={openDrawer}
+          >
+            <DrawerContent />
+          </CustomDrawer>
+        )}
       </Box>
-      <Box
-        component="main"
-        sx={{
-          height: "100%",
-          flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
-          overflow: "hidden",
-        }}
-      >
+      <Box component="main" sx={{ flexGrow: 1, p: 3, overflow: "hidden" }}>
         <Toolbar variant="dense" />
         <Box
           sx={{

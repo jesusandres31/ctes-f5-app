@@ -10,13 +10,12 @@ import {
   useTheme,
   ListSubheader,
   Collapse,
-  darken,
   lighten,
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useRouter } from "src/hooks";
 import { IMenuItem } from "src/types";
-import { removeForeslash, translateTitle } from "src/constants";
+import { removeForeslash, translateTitle } from "src/utils/header";
 import { toggleOpenDrawer, useUISelector } from "src/slices/ui/uiSlice";
 import { useAppDispatch } from "src/app/store";
 
@@ -70,10 +69,10 @@ export default function CustomList({
 
         useEffect(() => {
           if (item.nestedItems && !openCollapse) {
-            const nestedItem = item.nestedItems.find(
+            const currentNestedItem = item.nestedItems.find(
               (nestedItem) => route === nestedItem.to
             );
-            if (nestedItem) setOpenCollapse(true);
+            if (currentNestedItem) setOpenCollapse(true);
           }
           if (!openDrawer) setOpenCollapse(false);
         }, [openDrawer]);

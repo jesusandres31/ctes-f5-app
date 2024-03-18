@@ -2,12 +2,10 @@
 
 -
 
-reestrucutrar las cosas de conf. apitags, consts, app, types
+profile section. change psswd and usrname
 
 revisar todas las input validations
 
 crud transaction and cascade. pb_hooks. logical delete
 
 collapse data (rentals, invoices)
-
-prefix cuando selecciono un colapse. eliminar old colapse
