@@ -52,3 +52,9 @@ export const isValidNumber = (value: number | undefined): boolean => {
     value > VLDN.NN_REAL_NUMBER.min
   );
 };
+
+// table
+export const renderValue = (value: any) =>
+  typeof value === "string"
+    ? value.charAt(0).toUpperCase() + value.slice(1)
+    : value;

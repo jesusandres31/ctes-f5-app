@@ -52,6 +52,13 @@ export const rentalApi = mainApi.injectEndpoints({
       },
       providesTags: [TAG],
     }),
+    getRentalDetails: build.query<ListResult<Rental>, string>({
+      queryFn: async (_arg, _api, _options) => {
+        const res = await pb.collection(TAG).getList<Rental>();
+        return { data: res };
+      },
+      providesTags: [TAG],
+    }),
     createRental: build.mutation<Rental, CreateRentalReq>({
       queryFn: async (_arg, _api, _options) => {
         const res = await pb.collection(TAG).create<Rental>(_arg);

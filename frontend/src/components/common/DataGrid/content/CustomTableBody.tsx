@@ -1,4 +1,11 @@
-import { Column, IColumn, Item } from "src/types";
+import {
+  Column,
+  DataGridData,
+  DataGridError,
+  FetchItemDetailsFunc,
+  IColumn,
+  Item,
+} from "src/types";
 import {
   isCollapsed,
   isSelected,
@@ -19,7 +26,7 @@ import {
   lighten,
   TableHead as Head,
 } from "@mui/material";
-import { formatNulls } from "src/utils/format";
+import { formatNulls, renderValue } from "src/utils/format";
 import {
   KeyboardArrowDownRounded,
   KeyboardArrowUpRounded,
@@ -27,18 +34,29 @@ import {
 import React from "react";
 import { TableRow } from "@mui/material";
 import { TableBody, Table, Box, Collapse } from "@mui/material";
+import NoItems from "../../NoItems";
+import { ErrorMsg, Loading } from "../..";
+import { CustomGrid } from "./utils";
 
 interface CustomTableBodyProps {
   items: Item[];
   columns: Column;
-  isCollapsible: boolean;
+  dataDetail?: DataGridData;
+  errorDetail?: DataGridError;
+  isFetchingDetail?: boolean;
+  detailColumns?: Column;
+  fetchItemDetailsFunc?: FetchItemDetailsFunc;
   styles: any;
 }
 
 export default function CustomTableBody({
   items,
   columns,
-  isCollapsible,
+  dataDetail,
+  errorDetail,
+  isFetchingDetail,
+  detailColumns,
+  fetchItemDetailsFunc,
   styles,
 }: CustomTableBodyProps) {
   const dispatch = useAppDispatch();
@@ -55,6 +73,7 @@ export default function CustomTableBody({
       dispatch(resetCollapse());
     } else {
       dispatch(setCollapse(id));
+      if (fetchItemDetailsFunc) return fetchItemDetailsFunc(id);
     }
   };
 
@@ -109,9 +128,7 @@ export default function CustomTableBody({
                             whiteSpace: "nowrap",
                           }}
                         >
-                          {typeof value === "string"
-                            ? value.charAt(0).toUpperCase() + value.slice(1)
-                            : value}
+                          {renderValue(value)}
                         </Typography>
                       </Tooltip>
                     </TableCell>
@@ -119,7 +136,7 @@ export default function CustomTableBody({
                 );
               })}
 
-              {isCollapsible ? (
+              {fetchItemDetailsFunc ? (
                 <TableCell
                   align="right"
                   sx={isMobile ? styles.stickyMobile : styles.sticky}
@@ -135,6 +152,7 @@ export default function CustomTableBody({
                 </TableCell>
               ) : null}
             </TableRow>
+
             <TableRow>
               <TableCell
                 sx={{
@@ -144,51 +162,63 @@ export default function CustomTableBody({
                   borderBlock: collapsed ? "" : "none",
                 }}
                 colSpan={
-                  // + 2 because of the checkbox and the collapse cell.
-                  columns.length + 2
+                  // + 2 if collapsed because of the checkbox and the collapse cell.
+                  columns.length + (fetchItemDetailsFunc ? 2 : 1)
                 }
               >
                 <Collapse in={collapsed} timeout="auto" unmountOnExit>
                   <Box sx={{ margin: 1 }}>
-                    <Typography variant="h6" gutterBottom component="div">
-                      History
-                    </Typography>
                     <Table size="small">
                       <Head>
                         <TableRow>
-                          <TableCell>Date</TableCell>
-                          <TableCell>Customer</TableCell>
-                          <TableCell align="right">Amount</TableCell>
-                          <TableCell align="right">Total price ($)</TableCell>
+                          {detailColumns &&
+                            detailColumns.map((column) => (
+                              <TableCell
+                                size="small"
+                                key={column.id}
+                                align={column.align ?? "right"}
+                              >
+                                {column.label}
+                              </TableCell>
+                            ))}
                         </TableRow>
                       </Head>
-                      <TableBody>
-                        {[
-                          {
-                            date: "2020-01-05",
-                            customerId: "11091700",
-                            amount: 3,
-                          },
-                          {
-                            date: "2020-01-02",
-                            customerId: "Anonymous",
-                            amount: 1,
-                          },
-                        ].map((historyRow) => (
-                          <TableRow key={historyRow.date}>
-                            <TableCell component="th" scope="row">
-                              {historyRow.date}
-                            </TableCell>
-                            <TableCell>{historyRow.customerId}</TableCell>
-                            <TableCell align="right">
-                              {historyRow.amount}
-                            </TableCell>
-                            <TableCell align="right">
-                              {Math.round(historyRow.amount)}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
+
+                      {dataDetail &&
+                      dataDetail.items &&
+                      dataDetail.items.length > 0 ? (
+                        <TableBody
+                          sx={{ width: "100%", backgroundColor: "red" }}
+                        >
+                          {/* {dataDetail.items.map((item) =>
+                            (detailColumns as IColumn<Item>[]).map((column) => {
+                              const value = column.render
+                                ? column.render(item)
+                                : formatNulls(item[column.id]);
+
+                              return (
+                                <TableCell component="th" scope="item">
+                                  {renderValue(value)}
+                                </TableCell>
+                              );
+                            })
+                          )} */}
+                        </TableBody>
+                      ) : dataDetail &&
+                        dataDetail.items &&
+                        dataDetail.items.length ? (
+                        <CustomGrid>
+                          <NoItems />
+                        </CustomGrid>
+                      ) : errorDetail ? (
+                        <CustomGrid>
+                          <ErrorMsg />
+                        </CustomGrid>
+                      ) : isFetchingDetail ? (
+                        <CustomGrid>
+                          <Loading />
+                        </CustomGrid>
+                      ) : null}
                     </Table>
                   </Box>
                 </Collapse>

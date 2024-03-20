@@ -1,3 +1,4 @@
+import { SerializedError } from "@reduxjs/toolkit";
 import { FetchArgs, FetchBaseQueryMeta } from "@reduxjs/toolkit/query";
 import {
   BaseQueryFn,
@@ -87,12 +88,15 @@ export interface Input<T> {
   startValue?: T;
 }
 
-export type FetchItemsFunc = (
-  arg: GetList,
+/**
+ * DataGrid
+ */
+type RTKQueryFetchFn<T> = (
+  arg: T,
   preferCacheValue?: boolean | undefined
 ) => QueryActionCreatorResult<
   QueryDefinition<
-    GetList,
+    T,
     BaseQueryFn<
       string | FetchArgs,
       unknown,
@@ -105,6 +109,14 @@ export type FetchItemsFunc = (
     "api"
   >
 >;
+
+export type FetchItemDetailsFunc = RTKQueryFetchFn<string>;
+
+export type FetchItemsFunc = RTKQueryFetchFn<GetList>;
+
+export type DataGridData = ListResult<Item> | undefined;
+
+export type DataGridError = FetchBaseQueryError | SerializedError | undefined;
 
 /**
  * DataGrid entities

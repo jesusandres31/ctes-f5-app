@@ -1,8 +1,14 @@
 import { useEffect } from "react";
-import { Column, Entity, FetchItemsFunc, Item, Order } from "src/types";
+import {
+  Column,
+  DataGridData,
+  DataGridError,
+  Entity,
+  FetchItemDetailsFunc,
+  FetchItemsFunc,
+  Order,
+} from "src/types";
 import { Loading, ErrorMsg } from "src/components/common";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { SerializedError } from "@reduxjs/toolkit";
 import PageContainer from "../PageContainer/PageContainer";
 import NoItems from "../NoItems";
 import {
@@ -14,7 +20,6 @@ import {
   useUISelector,
 } from "src/slices/ui/uiSlice";
 import { useAppDispatch } from "src/app/store";
-import { ListResult } from "pocketbase";
 import CustomTableToolbar from "./content/CustomTableToolbar";
 import { CustomGrid } from "./content/utils";
 import { TableContainer, Table } from "@mui/material";
@@ -33,29 +38,38 @@ const styles = {
     right: 0,
     padding: 0,
     margin: 0,
+    backgroundColor: "white",
   },
 };
 
 interface DataGridProps {
-  data: ListResult<Item> | undefined;
-  error: FetchBaseQueryError | SerializedError | undefined;
+  data: DataGridData;
+  error: DataGridError;
   isFetching: boolean;
   columns: Column;
+  dataDetail?: DataGridData;
+  errorDetail?: DataGridError;
+  isFetchingDetail: boolean;
+  detailColumns?: Column;
   entity: Entity;
   defaultOrderBy: string;
   fetchItemsFunc: FetchItemsFunc;
-  isCollapsible?: boolean;
+  fetchItemDetailsFunc?: FetchItemDetailsFunc;
 }
 
 export default function DataGrid({
   data,
   error,
   isFetching,
+  dataDetail,
+  errorDetail,
+  isFetchingDetail,
   columns,
+  detailColumns,
   entity,
   defaultOrderBy,
   fetchItemsFunc,
-  isCollapsible = true,
+  fetchItemDetailsFunc,
 }: DataGridProps) {
   const dispatch = useAppDispatch();
   const { filter, order, orderBy, page, perPage } = useUISelector(
@@ -111,12 +125,17 @@ export default function DataGrid({
               columns={columns}
               items={data?.items}
               handleFetchItems={handleFetchItems}
+              isCollapsible={!!fetchItemDetailsFunc}
               styles={styles}
             />
             <CustomTableBody
               items={data.items}
               columns={columns}
-              isCollapsible={isCollapsible}
+              fetchItemDetailsFunc={fetchItemDetailsFunc}
+              dataDetail={dataDetail}
+              errorDetail={errorDetail}
+              isFetchingDetail={isFetchingDetail}
+              detailColumns={detailColumns}
               styles={styles}
             />
           </Table>

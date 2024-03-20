@@ -58,6 +58,9 @@ const COLUMNS: IColumn<Rental>[] = [
   },
 ];
 
+const DETAIL_COLUMNS = COLUMNS;
+// const DETAIL_COLUMNS: IColumn<Rental>[] = [];
+
 const DEFAULT_ORDER_BY: keyof Rental = "created";
 
 const ENTITY: Entity = "rentals";
@@ -66,6 +69,10 @@ export default function Rentals() {
   const { actionModal, selectedItems } = useUISelector((state) => state.ui);
   const [getRentals, { data, isFetching, error }] =
     rentalApi.useLazyGetRentalsQuery();
+  const [
+    getRentalDetails,
+    { data: dataDetail, isFetching: isFetchingDetail, error: errorDetail },
+  ] = rentalApi.useLazyGetRentalDetailsQuery();
 
   const MODAL = {
     create: actionModal.create === ENTITY,
@@ -80,9 +87,14 @@ export default function Rentals() {
         data={data}
         error={error}
         isFetching={isFetching}
+        dataDetail={dataDetail}
+        errorDetail={errorDetail}
+        isFetchingDetail={isFetchingDetail}
         columns={COLUMNS}
+        detailColumns={DETAIL_COLUMNS}
         defaultOrderBy={DEFAULT_ORDER_BY}
         fetchItemsFunc={getRentals}
+        fetchItemDetailsFunc={getRentalDetails}
         entity={ENTITY}
       />
       <DeleteRentals open={MODAL.delete} label={MODAL.label} />

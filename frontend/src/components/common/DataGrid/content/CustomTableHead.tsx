@@ -28,6 +28,7 @@ interface CustomTableHeadProps {
     order: Order,
     orderBy: string
   ) => Promise<void>;
+  isCollapsible: boolean;
   styles: any;
 }
 
@@ -35,6 +36,7 @@ export default function CustomTableHead({
   columns,
   items,
   handleFetchItems,
+  isCollapsible,
   styles,
 }: CustomTableHeadProps) {
   const dispatch = useAppDispatch();
@@ -97,10 +99,12 @@ export default function CustomTableHead({
           </TableCell>
         ))}
 
-        <TableCell
-          padding="checkbox"
-          sx={isMobile ? styles.stickyMobile : styles.sticky}
-        />
+        {isCollapsible && (
+          <TableCell
+            padding="checkbox"
+            sx={isMobile ? styles.stickyMobile : styles.sticky}
+          />
+        )}
       </TableRow>
     </TableHead>
   );
